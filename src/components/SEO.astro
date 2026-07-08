@@ -1,4 +1,6 @@
 ---
+import { business } from '../data/business';
+
 interface Props {
   title: string;
   description: string;
@@ -8,7 +10,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'Texas Plumbing Solutions';
+const SITE_NAME = business.name;
 const DEFAULT_OG_IMAGE = '/og-default.webp';
 
 const {
