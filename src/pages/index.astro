@@ -39,7 +39,7 @@ const schema = {
 <BaseLayout title={`${business.name} | HVAC Duct Manufacturing & Sheet Metal Fabrication Abu Dhabi`} description={business.description} schema={schema}>
 
   <!-- HERO -->
-  <section class="relative -mt-16 flex min-h-[100vh] items-center overflow-hidden bg-brand-950 lg:-mt-[76px]">
+  <section class="relative -mt-24 flex min-h-[100vh] items-center overflow-hidden bg-brand-950 lg:-mt-[108px]">
     <div class="absolute inset-0">
       <img src="/images/gallery/factory-workshop.webp" alt="Duct Masters manufacturing facility in Musaffah, Abu Dhabi" class="h-full w-full scale-105 object-cover" width="1200" height="670" loading="eager" />
       <div class="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-950/40"></div>
@@ -81,21 +81,6 @@ const schema = {
       <Icon name="lucide:chevron-down" class="size-4" />
     </div>
   </section>
-
-  <!-- CAPABILITIES TICKER -->
-  <div class="relative border-y border-white/5 bg-brand-950 py-5">
-    <div class="marquee-mask overflow-hidden">
-      <div class="animate-marquee flex w-max items-center gap-10 whitespace-nowrap">
-        {[...serviceTypes, ...serviceTypes].map((service) => (
-          <span class="flex items-center gap-3 text-sm font-medium uppercase tracking-wider text-brand-300">
-            <Icon name={service.icon} class="size-4 text-accent-400" />
-            {service.shortName}
-            <span class="ml-4 text-brand-700">/</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  </div>
 
   <!-- STATS -->
   <section class="relative bg-brand-950">
