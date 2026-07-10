@@ -31,13 +31,13 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// Periodic cleanup of stale entries (every 5 min)
-setInterval(() => {
+
+function cleanupStale(): void {
   const now = Date.now();
   for (const [ip, entry] of ipWindows) {
     if (now > entry.resetAt) ipWindows.delete(ip);
   }
-}, 300_000);
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -57,6 +57,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
   try {
     // Rate limit check
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
+    cleanupStale();
     if (!checkRateLimit(ip)) {
       return json({ ok: false, error: 'Too many requests. Please wait a moment before trying again.' }, 429);
     }
