@@ -1,8 +1,16 @@
-# Cloudflare Pages / Wrangler local secrets template.
-# Copy this file to ".dev.vars" (which is gitignored) and paste your real key.
-# Create a key at: https://resend.com/api-keys
+# ============================================================
+# Cloudflare Deployment Credentials (gitignored — NEVER commit)
+# ============================================================
+# Create an API token at: https://dash.cloudflare.com/profile/api-tokens
+# Template: "Edit Cloudflare Workers" (covers Pages)
+# Minimum permissions: Account → Cloudflare Pages → Edit
 #
-# In production, set the SAME variable in:
-#   Cloudflare Pages → your project → Settings → Environment variables → RESEND_API_KEY
+# Find your Account ID at: https://dash.cloudflare.com
+# (It's in the URL: dash.cloudflare.com/<ACCOUNT_ID>/...)
+# ============================================================
 
+CLOUDFLARE_API_TOKEN=your_api_token_here
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+
+# For Resend (contact form emails)
 RESEND_API_KEY=re_your_api_key_here
