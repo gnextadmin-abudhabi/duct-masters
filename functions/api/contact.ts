@@ -14,6 +14,31 @@ interface Env {
 const RECIPIENTS = ['gm@ductmasters.ae', 'md@ductmasters.ae', 'info@ductmasters.ae'];
 const FROM = 'Duct Masters Website <noreply@gnext.space>';
 
+// In-memory rate limiter — 5 submissions per IP per 60 seconds
+const RATE_WINDOW_MS = 60_000;
+const MAX_REQUESTS = 5;
+const ipWindows = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipWindows.get(ip);
+  if (!entry || now > entry.resetAt) {
+    ipWindows.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= MAX_REQUESTS) return false;
+  entry.count++;
+  return true;
+}
+
+// Periodic cleanup of stale entries (every 5 min)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of ipWindows) {
+    if (now > entry.resetAt) ipWindows.delete(ip);
+  }
+}, 300_000);
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -30,6 +55,12 @@ function esc(s: string): string {
 export const onRequestPost = async (context: { request: Request; env: Env }): Promise<Response> => {
   const { request, env } = context;
   try {
+    // Rate limit check
+    const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
+    if (!checkRateLimit(ip)) {
+      return json({ ok: false, error: 'Too many requests. Please wait a moment before trying again.' }, 429);
+    }
+
     const form = await request.formData();
     const get = (k: string) => String(form.get(k) ?? '').trim();
 

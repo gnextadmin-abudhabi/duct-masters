@@ -1,5 +1,5 @@
 // ============================================================
-// Duct Masters — Service Areas (8 industrial areas)
+// Duct Masters — Service Areas (10 industrial areas)
 // ============================================================
 
 export interface ServiceArea {
@@ -29,7 +29,7 @@ export const serviceAreas: ServiceArea[] = [
     description:
       'Duct Masters is based in Musaffah, the industrial heart of Abu Dhabi. We provide HVAC duct manufacturing and sheet metal fabrication to businesses throughout the Musaffah industrial zone.',
     featured: true,
-    nearby: ['musaffah-m40', 'icad', 'abu-dhabi-industrial-city'],
+    nearby: ['musaffah-m40', 'icad', 'abu-dhabi-industrial-city', 'saadiyat-island', 'reem-island'],
   },
   {
     slug: 'musaffah-m40',
@@ -71,7 +71,7 @@ export const serviceAreas: ServiceArea[] = [
     description:
       'Duct Masters provides HVAC duct manufacturing, laser cutting, CNC forming, and full metal fabrication services to projects across Abu Dhabi Industrial City.',
     featured: true,
-    nearby: ['musaffah', 'icad', 'mafraq-industrial-area'],
+    nearby: ['musaffah', 'icad', 'mafraq-industrial-area', 'reem-island'],
   },
   {
     slug: 'mafraq-industrial-area',
@@ -128,6 +128,34 @@ export const serviceAreas: ServiceArea[] = [
       'Industrial duct fabrication and metal works for oil, gas, and infrastructure projects across the Ruwais and Al Dhafra industrial region. Duct Masters provides reliable supply and delivery to this key industrial zone.',
     featured: false,
     nearby: ['musaffah'],
+  },
+  {
+    slug: 'saadiyat-island',
+    name: 'Saadiyat Island',
+    county: 'Abu Dhabi',
+    state: 'AD',
+    zipCodes: [],
+    population: 35000,
+    lat: 24.5450,
+    lng: 54.4111,
+    description:
+      'Duct Masters provides HVAC duct manufacturing and custom metal fabrication to commercial, hospitality, and cultural projects on Saadiyat Island — home to luxury resorts, museums, and premium residential developments in Abu Dhabi.',
+    featured: true,
+    nearby: ['musaffah', 'reem-island'],
+  },
+  {
+    slug: 'reem-island',
+    name: 'Reem Island',
+    county: 'Abu Dhabi',
+    state: 'AD',
+    zipCodes: [],
+    population: 200000,
+    lat: 24.4949,
+    lng: 54.4034,
+    description:
+      'Duct Masters supplies HVAC duct systems and fabricated metal components to residential, commercial, and mixed-use developments on Reem Island — one of Abu Dhabi\u2019s largest and fastest-growing urban communities.',
+    featured: true,
+    nearby: ['musaffah', 'saadiyat-island', 'abu-dhabi-industrial-city'],
   },
 ];
 

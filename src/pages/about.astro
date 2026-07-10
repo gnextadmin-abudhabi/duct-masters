@@ -6,6 +6,29 @@ import { serviceAreas } from '../data/serviceAreas';
 
 const years = yearsInBusiness();
 
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: `About ${business.name}`,
+  description: `${business.name} is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company. Learn about our facility, capabilities, and ${years}+ years of experience serving the UAE.`,
+  about: {
+    '@type': 'HVACBusiness',
+    '@id': `${business.website}/#business`,
+    name: business.name,
+    legalName: business.legalName,
+    foundingDate: `${business.yearEstablished}`,
+    url: business.website,
+    telephone: business.phone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.state,
+      addressCountry: 'AE',
+    },
+  },
+};
+
 const values = [
   { icon: 'lucide:ruler', title: 'Precision', desc: 'Every component is manufactured to exact specifications using CNC machinery and quality control processes.' },
   { icon: 'lucide:shield-check', title: 'Reliability', desc: 'On-time delivery and consistent quality — we understand that projects depend on dependable suppliers.' },
@@ -24,6 +47,7 @@ const quickFacts = [
 <BaseLayout
   title={`About ${business.name} | HVAC Duct Manufacturing Abu Dhabi`}
   description={`${business.name} is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company. Learn about our facility, capabilities, and ${years}+ years of experience serving the UAE.`}
+  schema={aboutSchema}
 >
   <!-- Hero -->
   <section class="relative -mt-24 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[108px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">

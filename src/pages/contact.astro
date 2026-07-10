@@ -2,11 +2,20 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { business } from '../data/business';
+
+const contactSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: `Contact ${business.name}`,
+  description: `Contact ${business.name} in Musaffah, Abu Dhabi. Call ${business.phone} or email ${business.email} for HVAC duct manufacturing and sheet metal fabrication quotations.`,
+  about: { '@id': `${business.website}/#business` },
+};
 ---
 
 <BaseLayout
   title={`Contact ${business.name} | HVAC Duct Manufacturing Abu Dhabi`}
   description={`Contact ${business.name} in Musaffah, Abu Dhabi. Call ${business.phone} or email ${business.email} for HVAC duct manufacturing and sheet metal fabrication quotations.`}
+  schema={contactSchema}
 >
   <!-- Hero -->
   <section class="relative -mt-24 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[108px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">
@@ -178,6 +187,7 @@ import { business } from '../data/business';
                   <option value="custom-industrial-fabrication">Custom Industrial Fabrication</option>
                   <option value="powder-coating-finishing">Powder Coating & Finishing</option>
                   <option value="design-engineering">Duct System Design & Engineering</option>
+                  <option value="stainless-steel-duct-fabrication">Stainless Steel Duct Fabrication</option>
                   <option value="supply-delivery">Duct Supply & Installation</option>
                 </select>
               </div>

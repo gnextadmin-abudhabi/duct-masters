@@ -1,5 +1,5 @@
 // ============================================================
-// Duct Masters — Service Types (10 fabrication services)
+// Duct Masters — Service Types (11 fabrication services)
 // ============================================================
 
 export interface ProcessStep {
@@ -78,7 +78,7 @@ export const serviceTypes: ServiceType[] = [
       { label: 'Custom Industrial Ducting', min: 10000, max: 100000, unit: 'per order' },
     ],
     keywords: ['HVAC duct manufacturing Abu Dhabi', 'AC duct fabrication', 'duct fabrication Musaffah', 'duct manufacturing UAE'],
-    relatedServices: ['sheet-metal-fabrication', 'cnc-forming', 'design-engineering', 'supply-delivery'],
+    relatedServices: ['sheet-metal-fabrication', 'cnc-forming', 'design-engineering', 'supply-delivery', 'stainless-steel-duct-fabrication'],
   },
   {
     slug: 'laser-cutting',
@@ -153,7 +153,7 @@ export const serviceTypes: ServiceType[] = [
       { label: 'Production Welding', min: 5000, max: 50000, unit: 'per order' },
     ],
     keywords: ['welding services Musaffah', 'metal welding Abu Dhabi', 'industrial welding UAE'],
-    relatedServices: ['sheet-metal-fabrication', 'custom-industrial-fabrication', 'duct-fabrication'],
+    relatedServices: ['sheet-metal-fabrication', 'custom-industrial-fabrication', 'duct-fabrication', 'stainless-steel-duct-fabrication'],
   },
   {
     slug: 'metal-rolling-punching',
@@ -279,6 +279,31 @@ export const serviceTypes: ServiceType[] = [
     ],
     keywords: ['duct supply Musaffah', 'duct installation Abu Dhabi', 'duct delivery UAE'],
     relatedServices: ['duct-fabrication', 'sheet-metal-fabrication', 'design-engineering'],
+  },
+  {
+    slug: 'stainless-steel-duct-fabrication',
+    name: 'Stainless Steel Duct Fabrication',
+    shortName: 'SS Duct Fab',
+    description:
+      'Stainless steel duct fabrication for commercial kitchens, industrial ventilation, laboratory exhaust, and corrosive environment applications. We manufacture stainless steel ductwork in grades 304 and 316L with TIG welding for superior corrosion resistance, hygiene compliance, and long-term durability.',
+    image: '/images/gallery/indian_workers_fabricating_hvac_….webp',
+    icon: 'lucide:layers',
+    emergency: false,
+    featured: false,
+    process: [
+      { title: 'Specification Review', description: 'Review of project specs, material grade requirements (304/316L), and design drawings.' },
+      { title: 'Material Preparation', description: 'Stainless steel sheets are selected, inspected, and prepared to required gauges and dimensions.' },
+      { title: 'Precision Fabrication', description: 'Cutting, forming, and assembly of SS duct sections using plasma cutting, CNC press brakes, and TIG welding.' },
+      { title: 'Weld Finishing', description: 'Weld passivation, pickling where required, and surface finishing for corrosion resistance and hygiene standards.' },
+      { title: 'Inspection & QC', description: 'Dimensional checks, weld inspection, surface finish verification, and final QC before dispatch.' },
+    ],
+    priceRanges: [
+      { label: 'Kitchen Exhaust Duty', min: 1500, max: 12000, unit: 'per system' },
+      { label: 'Industrial SS Ductwork', min: 5000, max: 50000, unit: 'per project' },
+      { label: 'Large Commercial Systems', min: 10000, max: 150000, unit: 'per order' },
+    ],
+    keywords: ['stainless steel duct fabrication Abu Dhabi', 'SS duct manufacturing UAE', 'kitchen exhaust duct Musaffah', 'stainless steel ductwork fabrication'],
+    relatedServices: ['duct-fabrication', 'sheet-metal-fabrication', 'welding-services', 'powder-coating-finishing'],
   },
 ];
 

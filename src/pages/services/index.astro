@@ -4,11 +4,29 @@ import { Icon } from 'astro-icon/components';
 import { business } from '../../data/business';
 import { serviceTypes } from '../../data/serviceTypes';
 import { serviceUrl, contactUrl } from '../../lib/urls';
+
+const servicesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Fabrication Services',
+  description: `${business.name} offers a full range of HVAC duct manufacturing and metal fabrication services across ${business.serviceRadius}.`,
+  itemListElement: serviceTypes.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Service',
+      name: s.name,
+      description: s.description,
+      url: `${business.website}${serviceUrl(s.slug)}`,
+    },
+  })),
+};
 ---
 
 <BaseLayout
   title={`Fabrication Services | ${business.name}`}
   description={`${business.name} offers a full range of HVAC duct manufacturing and metal fabrication services across ${business.serviceRadius}. From sheet metal fabrication to CNC forming and laser cutting.`}
+  schema={servicesSchema}
 >
 
   <section class="relative -mt-24 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[108px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">

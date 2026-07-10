@@ -47,6 +47,7 @@ export interface Business {
   logo: string;
   logoWhite: string;
   ogImage: string;
+  googleBusinessProfile: string;
 }
 
 export const business: Business = {
@@ -75,7 +76,7 @@ export const business: Business = {
     lat: 24.3489,
     lng: 54.4917,
   },
-  googleMapsUrl: 'https://maps.app.goo.gl/7teFLGo5eA2zGYp37?g_st=awb',
+  googleMapsUrl: 'https://maps.app.goo.gl/QZKr1kfig3qjU5om6',
   socialMedia: {
     facebook: '',
     instagram: '',
@@ -95,6 +96,7 @@ export const business: Business = {
   logo: '/images/logo.png',
   logoWhite: '/images/logo-white.png',
   ogImage: '/images/og-image.jpg',
+  googleBusinessProfile: 'https://maps.app.goo.gl/QZKr1kfig3qjU5om6',
 };
 
 export function yearsInBusiness(): number {

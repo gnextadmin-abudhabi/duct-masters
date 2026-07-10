@@ -26,11 +26,15 @@ const stats = [
   { text: 'UAE', en: 'Licensed Manufacturer', ar: 'مرخص في الإمارات', icon: 'lucide:shield-check' },
 ];
 
+const gbp = business.googleBusinessProfile
+  ? { sameAs: [business.googleBusinessProfile] }
+  : {};
+
 const schema = {
   '@context': 'https://schema.org',
   '@graph': [
     { '@type': 'WebSite', '@id': `${business.website}/#website`, url: business.website, name: business.name, description: business.description, publisher: { '@id': `${business.website}/#business` } },
-    { '@type': 'HVACBusiness', '@id': `${business.website}/#business`, name: business.name, legalName: business.legalName, url: business.website, telephone: business.phone, email: business.email, description: business.description, foundingDate: `${business.yearEstablished}`, address: { '@type': 'PostalAddress', streetAddress: business.address.street, addressLocality: business.address.city, addressRegion: business.address.state, addressCountry: 'AE' }, geo: { '@type': 'GeoCoordinates', latitude: business.coordinates.lat, longitude: business.coordinates.lng }, openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], opens: '08:00', closes: '17:00' }], areaServed: serviceAreas.filter(a => a.featured).map((area) => ({ '@type': 'City', name: area.name, containedInPlace: { '@type': 'AdministrativeArea', name: area.county } })), hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Fabrication Services', itemListElement: serviceTypes.map(s => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name, description: s.description } })) } },
+    { '@type': 'HVACBusiness', '@id': `${business.website}/#business`, name: business.name, legalName: business.legalName, url: business.website, telephone: business.phone, email: business.email, description: business.description, foundingDate: `${business.yearEstablished}`, ...gbp, address: { '@type': 'PostalAddress', streetAddress: business.address.street, addressLocality: business.address.city, addressRegion: business.address.state, addressCountry: 'AE' }, geo: { '@type': 'GeoCoordinates', latitude: business.coordinates.lat, longitude: business.coordinates.lng }, openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], opens: '08:00', closes: '17:00' }], areaServed: serviceAreas.filter(a => a.featured).map((area) => ({ '@type': 'City', name: area.name, containedInPlace: { '@type': 'AdministrativeArea', name: area.county } })), hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Fabrication Services', itemListElement: serviceTypes.map(s => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name, description: s.description } })) } },
     { '@type': 'WebPage', '@id': `${business.website}/#webpage`, url: business.website, name: `${business.name} | HVAC Duct Manufacturing Abu Dhabi`, isPartOf: { '@id': `${business.website}/#website` }, about: { '@id': `${business.website}/#business` }, description: business.description },
   ],
 };

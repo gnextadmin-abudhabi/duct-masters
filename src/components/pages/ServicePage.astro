@@ -39,6 +39,28 @@ const images = [
 ];
 
 if (!service) Astro.response.status = 404;
+
+const schema = service ? {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: `${service.name} in Abu Dhabi`,
+  description: pageDescription,
+  provider: {
+    '@type': 'HVACBusiness',
+    '@id': `${business.website}/#business`,
+    name: business.name,
+    telephone: business.phone,
+    url: business.website,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.state,
+      addressCountry: 'AE',
+    },
+  },
+  areaServed: { '@type': 'City', name: 'Abu Dhabi' },
+} : undefined;
 ---
 
 {!service ? (
@@ -49,7 +71,7 @@ if (!service) Astro.response.status = 404;
     </div>
   </BaseLayout>
 ) : (
-  <BaseLayout title={pageTitle} description={pageDescription}>
+  <BaseLayout title={pageTitle} description={pageDescription} schema={schema}>
 
     {/* ===== HERO ===== */}
     <section class="relative overflow-hidden bg-brand-950">

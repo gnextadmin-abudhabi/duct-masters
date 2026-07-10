@@ -102,6 +102,28 @@ export function generateFaqs(service?: string, area?: string): FaqItem[] {
           'We accept DXF, DWG, AI, and PDF files for laser cutting jobs. Files should include the cutting profile with dimensions. Our team can also assist with file preparation and nesting optimization to reduce material waste.',
       },
     ],
+    'stainless-steel-duct-fabrication': [
+      {
+        question: 'What grades of stainless steel do you use for duct fabrication?',
+        answer:
+          'We fabricate stainless steel ductwork primarily in grades 304 and 316L. Grade 304 is suitable for most commercial kitchen exhaust and general industrial applications. Grade 316L offers enhanced corrosion resistance for chemical environments, coastal installations, and laboratory exhaust systems.',
+      },
+      {
+        question: 'What applications require stainless steel ductwork?',
+        answer:
+          'Stainless steel ductwork is essential for commercial kitchen exhaust hoods, laboratory fume extraction, industrial process ventilation, corrosive chemical environments, and any application where hygiene, corrosion resistance, or high-temperature performance is required. It is also commonly specified for luxury developments and hospitals in the UAE.',
+      },
+      {
+        question: 'Do you use TIG welding for stainless steel ducts?',
+        answer:
+          'Yes. We use TIG (Tungsten Inert Gas) welding for all stainless steel duct fabrication. TIG welding produces clean, precise welds with minimal spatter, ensuring corrosion resistance is maintained at all joints. Weld passivation and pickling are performed where project specifications require it.',
+      },
+      {
+        question: 'What is the difference between GI and stainless steel ductwork?',
+        answer:
+          'Galvanized iron (GI) ductwork is the standard for general HVAC air distribution and is cost-effective for most commercial applications. Stainless steel ductwork provides superior corrosion resistance, hygiene, and high-temperature tolerance — making it the required choice for kitchen exhaust, laboratory, and industrial process applications. We manufacture both and can advise on the right material for your project.',
+      },
+    ],
   };
 
   const areaFaqs: FaqItem[] = area
