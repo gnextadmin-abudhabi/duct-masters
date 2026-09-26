@@ -33,7 +33,7 @@ const industriesSchema = {
     '@type': 'ListItem',
     position: i + 1,
     item: {
-      '@type': 'Thing',
+      '@type': 'WebPage',
       name: ind.name,
       description: ind.desc,
       url: `${business.website}/industries/${ind.slug}/`,
@@ -44,8 +44,9 @@ const industriesSchema = {
 
 <BaseLayout
   title={`Industries Served | ${business.name}`}
-  description={`${business.name} serves HVAC contractors, MEP contractors, construction companies, industrial facilities, commercial buildings, and infrastructure projects across Abu Dhabi and the UAE.`}
+  description={`Ductwork and metal fabrication for HVAC and MEP contractors, construction, industrial, commercial and infrastructure projects across the UAE.`}
   schema={industriesSchema}
+  breadcrumbs={[{ label: 'Industries' }]}
 >
 
   <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">

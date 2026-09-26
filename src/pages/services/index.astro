@@ -15,8 +15,8 @@ const servicesSchema = {
     position: i + 1,
     item: {
       '@type': 'Service',
+      '@id': `${business.website}${serviceUrl(s.slug)}#service`,
       name: s.name,
-      description: s.description,
       url: `${business.website}${serviceUrl(s.slug)}`,
     },
   })),
@@ -25,8 +25,9 @@ const servicesSchema = {
 
 <BaseLayout
   title={`Fabrication Services | ${business.name}`}
-  description={`${business.name} offers a full range of HVAC duct manufacturing and metal fabrication services across ${business.serviceRadius}. From sheet metal fabrication to CNC forming and laser cutting.`}
+  description={`HVAC duct manufacturing, sheet metal fabrication, laser cutting, CNC forming, welding and powder coating from our M-40 Musaffah facility.`}
   schema={servicesSchema}
+  breadcrumbs={[{ label: 'Services' }]}
 >
 
   <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">

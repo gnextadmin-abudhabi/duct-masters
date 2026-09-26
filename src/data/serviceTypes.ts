@@ -36,7 +36,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Sheet Metal',
     description:
       'Comprehensive sheet metal fabrication for HVAC, construction, industrial, commercial, and infrastructure projects. Services include cutting, forming, bending, shaping, joining, and finishing sheet metal components to exact project specifications.',
-    image: '/images/gallery/workers_fabricating_sheet_metal_….webp',
+    image: '/images/gallery/workers-fabricating-sheet-metal.webp',
     icon: 'lucide:layout-panel-top',
     emergency: false,
     featured: true,
@@ -61,7 +61,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Duct Fab',
     description:
       'Manufacturing and fabrication of HVAC duct systems for air conditioning and ventilation projects. This is one of our core services — custom ductwork for commercial, industrial, and infrastructure HVAC systems, built to SMACNA and project standards.',
-    image: '/images/gallery/workers_in_duct_manufacturing_wo….webp',
+    image: '/images/gallery/duct-manufacturing-workshop.webp',
     icon: 'lucide:air-vent',
     emergency: false,
     featured: true,
@@ -111,7 +111,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'CNC Forming',
     description:
       'CNC metal forming and bending services for accurate metal shaping. Our CNC press brakes and forming equipment support duct fabrication, sheet metal fabrication, and customized industrial components with repeatable precision.',
-    image: '/images/gallery/indian_technician_operating_cnc_….webp',
+    image: '/images/gallery/technician-operating-cnc-machine.webp',
     icon: 'lucide:fold-vertical',
     emergency: false,
     featured: false,
@@ -136,7 +136,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Welding',
     description:
       'Industrial welding services for fabricated metal components, duct-related supports, frames, structures, and custom metal works. MIG, TIG, and arc welding capabilities for mild steel, stainless steel, and aluminum.',
-    image: '/images/gallery/indian_workers_fabricating_hvac_….webp',
+    image: '/images/gallery/workers-fabricating-hvac-ducts.webp',
     icon: 'lucide:flame',
     emergency: false,
     featured: false,
@@ -161,7 +161,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Roll & Punch',
     description:
       'Metal rolling and punching services for fabrication projects requiring shaped, perforated, or prepared metal sections. Plate rolling, section rolling, and CNC punching for HVAC components, structural sections, and custom profiles.',
-    image: '/images/gallery/indian_worker_operating_metal_ma….webp',
+    image: '/images/gallery/worker-operating-metal-machine.webp',
     icon: 'lucide:move-diagonal',
     emergency: false,
     featured: false,
@@ -186,7 +186,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Custom Fab',
     description:
       'Custom fabrication solutions for contractors, HVAC companies, construction firms, and industrial clients requiring project-specific metal parts, assemblies, or structures. Turnkey fabrication from concept to delivery.',
-    image: '/images/gallery/workers_fabricating_metal_compon….webp',
+    image: '/images/gallery/workers-fabricating-metal-components.webp',
     icon: 'lucide:cog',
     emergency: false,
     featured: false,
@@ -236,7 +236,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Design',
     description:
       'Duct system design and engineering support for HVAC duct manufacturing and project requirements. Includes technical coordination, fabrication planning, shop drawing preparation, and project-specific duct solutions.',
-    image: '/images/gallery/engineers_reviewing_drawings_in_….webp',
+    image: '/images/gallery/engineers-reviewing-drawings.webp',
     icon: 'lucide:pencil-ruler',
     emergency: false,
     featured: false,
@@ -261,7 +261,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'Supply',
     description:
       'Supply and delivery of manufactured ducting products and fabricated components for projects across Abu Dhabi and the UAE. Reliable logistics support with on-time delivery to project sites, including installation coordination where required.',
-    image: '/images/gallery/technicians_working_on_duct_sect….webp',
+    image: '/images/gallery/technicians-working-on-duct-sections.webp',
     icon: 'lucide:truck',
     emergency: false,
     featured: false,
@@ -286,7 +286,7 @@ export const serviceTypes: ServiceType[] = [
     shortName: 'SS Duct Fab',
     description:
       'Stainless steel duct fabrication for commercial kitchens, industrial ventilation, laboratory exhaust, and corrosive environment applications. We manufacture stainless steel ductwork in grades 304 and 316L with TIG welding for superior corrosion resistance, hygiene compliance, and long-term durability.',
-    image: '/images/gallery/indian_workers_fabricating_hvac_….webp',
+    image: '/images/gallery/workers-fabricating-hvac-ducts.webp',
     icon: 'lucide:layers',
     emergency: false,
     featured: false,

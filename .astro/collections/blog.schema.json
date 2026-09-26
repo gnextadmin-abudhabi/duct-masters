@@ -40,6 +40,26 @@
           "type": "boolean",
           "default": false
         },
+        "seoTitle": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "updatedDate": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "imageAlt": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
         "$schema": {
           "type": "string"
         }

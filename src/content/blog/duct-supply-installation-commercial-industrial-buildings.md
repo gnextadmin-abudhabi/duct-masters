@@ -1,15 +1,18 @@
 ---
 title: "Duct Supply and Installation for Commercial and Industrial Buildings"
-description: "What commercial and industrial project managers need to know about duct supply, delivery logistics, and installation coordination for HVAC systems in the UAE."
+description: "How phased duct supply, delivery planning and installation coordination keep commercial and industrial HVAC projects in Abu Dhabi on schedule."
 publishDate: "2026-05-12"
 author: "Duct Masters"
 category: "industry"
 tags: ['duct supply', 'duct installation', 'commercial buildings', 'industrial HVAC', 'project logistics']
-readingTime: "5 min read"
+readingTime: "1 min read"
 featured: false
+seoTitle: "Duct Supply & Installation for Commercial Buildings"
+updatedDate: "2026-09-26"
+image: "/images/gallery/technicians-working-on-duct-sections.webp"
+imageAlt: "Technicians preparing duct sections for site delivery"
+services: ['supply-delivery', 'duct-fabrication']
 ---
-
-# Duct Supply and Installation for Commercial and Industrial Buildings
 
 Efficient duct supply and delivery logistics are critical for keeping HVAC projects on schedule. For commercial and industrial buildings in the UAE, coordinating duct manufacturing with site installation requires careful planning.
 
@@ -45,4 +48,4 @@ While Duct Masters focuses on manufacturing and supply, we coordinate closely wi
 - Quality manufacturing to SMACNA standards
 - Competitive pricing for project supply contracts
 
-Contact us at info@ductmasters.ae or call +971 02 564 9566 to discuss your duct supply requirements.
+Contact us at info@ductmasters.ae or call +971 2 564 9566 to discuss your duct supply requirements.

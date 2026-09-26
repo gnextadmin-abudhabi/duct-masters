@@ -1,20 +1,29 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { business, yearsInBusiness } from '../../data/business';
-import { serviceTypes, getServiceBySlug } from '../../data/serviceTypes';
+import { getServiceBySlug } from '../../data/serviceTypes';
 import { serviceUrl, contactUrl } from '../../lib/urls';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SeoFaq from '../../components/SeoFaq.astro';
+import LocalPageLinks from '../../components/LocalPageLinks.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import { getLocalPagesForService, localTitle, localDescription, localHeading } from '../../data/localPages';
+import { serviceSchema } from '../../lib/schema';
 
 interface Props {
   serviceSlug: string;
-  pageTitle: string;
-  pageDescription: string;
+  /** Optional overrides — defaults come from src/data/localPages.ts */
+  pageTitle?: string;
+  pageDescription?: string;
 }
 
-const { serviceSlug, pageTitle, pageDescription } = Astro.props;
+const { serviceSlug } = Astro.props;
 const service = getServiceBySlug(serviceSlug);
 const years = yearsInBusiness();
+const pageTitle = Astro.props.pageTitle ?? localTitle(serviceSlug, null);
+const pageDescription = Astro.props.pageDescription ?? localDescription(serviceSlug, null);
+const heading = localHeading(serviceSlug, null);
+const currentPath = Astro.url.pathname;
 
 const industriesList = [
   { name: 'HVAC Contractors', icon: 'lucide:air-vent', desc: 'Ductwork and ventilation system fabrication' },
@@ -25,42 +34,33 @@ const industriesList = [
   { name: 'Infrastructure Projects', icon: 'lucide:landmark', desc: 'Airports, metro, public works' },
 ];
 
-// Pick 4 images for this service page — rotate based on service index
-const serviceIdx = serviceTypes.indexOf(service);
 const images = [
   { src: '/images/gallery/factory-workshop.webp', alt: 'Duct Masters manufacturing facility in Musaffah' },
   { src: '/images/gallery/laser-machine-operator.webp', alt: 'CNC laser cutting precision fabrication' },
-  { src: '/images/gallery/workers-fabricating-sheet-metal-….webp', alt: 'Sheet metal fabrication in progress' },
-  { src: '/images/gallery/technician-inspecting-hvac-duct-….webp', alt: 'Quality inspection of HVAC ductwork' },
-  { src: '/images/gallery/engineers-reviewing-drawings-in-….webp', alt: 'Engineering review of fabrication drawings' },
-  { src: '/images/gallery/workers-collaborating-on-metal-f….webp', alt: 'Fabrication team at work' },
-  { src: '/images/gallery/preparing-components.webp', alt: 'Preparing metal components for fabrication' },
-  { src: '/images/gallery/logo-on-uniform.webp', alt: 'Duct Masters factory team' },
+  { src: '/images/gallery/workers-fabricating-sheet-metal.webp', alt: 'Sheet metal fabrication in progress' },
+  { src: '/images/gallery/technician-inspecting-hvac-duct.webp', alt: 'Quality inspection of HVAC ductwork' },
 ];
 
 if (!service) Astro.response.status = 404;
 
-const schema = service ? {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: `${service.name} in Abu Dhabi`,
-  description: pageDescription,
-  provider: {
-    '@type': 'HVACBusiness',
-    '@id': `${business.website}/#business`,
-    name: business.name,
-    telephone: business.phone,
-    url: business.website,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: business.address.street,
-      addressLocality: business.address.city,
-      addressRegion: business.address.state,
-      addressCountry: 'AE',
-    },
-  },
-  areaServed: { '@type': 'City', name: 'Abu Dhabi' },
-} : undefined;
+const schema = service
+  ? serviceSchema({
+      url: currentPath,
+      name: heading,
+      serviceType: service.name,
+      description: pageDescription,
+      image: service.image,
+      areaServed: { '@type': 'AdministrativeArea', name: 'Abu Dhabi' },
+    })
+  : undefined;
+
+const breadcrumbs = service
+  ? [
+      { label: 'Services', href: '/services/' },
+      { label: service.name, href: serviceUrl(service.slug) },
+      { label: heading },
+    ]
+  : undefined;
 ---
 
 {!service ? (
@@ -71,7 +71,7 @@ const schema = service ? {
     </div>
   </BaseLayout>
 ) : (
-  <BaseLayout title={pageTitle} description={pageDescription} schema={schema}>
+  <BaseLayout title={pageTitle} description={pageDescription} schema={schema} breadcrumbs={breadcrumbs}>
 
     {/* ===== HERO ===== */}
     <section class="relative overflow-hidden bg-brand-950">
@@ -86,13 +86,13 @@ const schema = service ? {
           <Icon name={service.icon} class="size-5" />
           <span class="text-sm font-semibold uppercase tracking-wide">{service.name}</span>
         </div>
-        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">{pageTitle}</h1>
+        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">{heading}</h1>
         <p data-reveal style="--reveal-delay: 160ms" class="mt-6 max-w-3xl text-lg leading-relaxed text-brand-200">{service.description}</p>
         <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
             <Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />Call {business.phone}
           </a>
-          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3.5 text-sm font-semibold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-green-500">
+          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3.5 text-sm font-semibold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-green-600">
             <Icon name="lucide:message-circle" class="size-4" />WhatsApp
           </a>
           <a href={contactUrl()} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
@@ -262,9 +262,18 @@ const schema = service ? {
       </section>
     )}
 
+    <LocalPageLinks
+      pages={getLocalPagesForService(service.slug)}
+      currentPath={currentPath}
+      heading={`${service.name} Near You`}
+      intro={`We deliver ${service.name.toLowerCase()} from our M-40 Musaffah facility to projects across Abu Dhabi. See details for your area:`}
+    />
+
+    <RelatedPosts serviceSlug={service.slug} />
+
     {/* ===== FAQ ===== */}
     <div class="border-t border-stone-200/60 bg-white">
-      <SeoFaq service={service} />
+      <SeoFaq service={service} area="Abu Dhabi" />
     </div>
 
     {/* ===== FINAL CTA ===== */}
@@ -282,7 +291,7 @@ const schema = service ? {
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
             <Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" />{business.phone}
           </a>
-          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-500">
+          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600">
             <Icon name="lucide:message-circle" class="size-5" />WhatsApp
           </a>
           <a href={`mailto:${business.email}`} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">

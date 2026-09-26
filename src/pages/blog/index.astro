@@ -16,6 +16,22 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
   news: { bg: 'bg-stone-100', text: 'text-stone-600' },
 };
 
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  '@id': `${business.website}${blogUrl()}#blog`,
+  name: `${business.name} Guides & Insights`,
+  url: `${business.website}${blogUrl()}`,
+  publisher: { '@id': `${business.website}/#business` },
+  blogPost: posts.map((post) => ({
+    '@type': 'BlogPosting',
+    '@id': `${business.website}${blogUrl(post.id)}#article`,
+    headline: post.data.title,
+    url: `${business.website}${blogUrl(post.id)}`,
+    datePublished: post.data.publishDate,
+  })),
+};
+
 function formatDate(iso: string): string {
   const date = new Date(iso + 'T00:00:00');
   return date.toLocaleDateString('en-US', {
@@ -28,7 +44,9 @@ function formatDate(iso: string): string {
 
 <BaseLayout
   title={`Industry Insights & Guides | ${business.name}`}
-  description="HVAC duct manufacturing insights, metal fabrication guides, and industry news from Duct Masters. Expert content for contractors and project managers in Abu Dhabi and the UAE."
+  description="HVAC duct manufacturing and metal fabrication guides for contractors and project managers in Abu Dhabi and the UAE, from Duct Masters."
+  schema={blogSchema}
+  breadcrumbs={[{ label: 'Blog' }]}
 >
 
   <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">

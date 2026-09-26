@@ -5,23 +5,22 @@ import type { ServiceType } from '../data/serviceTypes';
 import { generateFaqs } from '../data/seoContent';
 
 interface Props {
-  area?: ServiceArea;
+  /** Area page object, or a plain place name such as "Abu Dhabi" */
+  area?: ServiceArea | string;
   service?: ServiceType;
 }
 
 const { area, service } = Astro.props;
+const place = typeof area === 'string' ? area : area?.name;
 
-const faqs = generateFaqs(
-  service?.slug,
-  area?.name,
-);
+const faqs = generateFaqs(service?.slug, place);
 
-const heading = service && area
-  ? `Frequently Asked Questions about ${service.name} in ${area.name}`
+const heading = service && place
+  ? `${service.name} in ${place}: FAQs`
   : service
   ? `Frequently Asked Questions about ${service.name}`
-  : area
-  ? `Frequently Asked Questions about Fabrication Services in ${area.name}`
+  : place
+  ? `Fabrication Services in ${place}: FAQs`
   : 'Frequently Asked Questions';
 
 const schema = {

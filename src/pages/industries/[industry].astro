@@ -4,6 +4,8 @@ import { Icon } from 'astro-icon/components';
 import { business } from '../../data/business';
 import { serviceTypes } from '../../data/serviceTypes';
 import { serviceUrl, contactUrl } from '../../lib/urls';
+import { getLocalPage } from '../../data/localPages';
+import { businessRef } from '../../lib/schema';
 
 interface IndustryData {
   slug: string;
@@ -87,6 +89,39 @@ const data = industries[industry as string];
 if (!data) {
   Astro.response.status = 404;
 }
+
+const pageTitle = data
+  ? [`Ductwork & Fabrication for ${data.name} | ${business.name}`, `Ductwork for ${data.name} | ${business.name}`, `Ductwork for ${data.name}`]
+      .find((t) => t.length <= 60)
+  : '';
+const pageDescription = data
+  ? [
+      `HVAC ductwork and metal fabrication for ${data.name} in Abu Dhabi and the UAE, made at our M-40 Musaffah factory.`,
+      `HVAC ductwork and metal fabrication for ${data.name} across Abu Dhabi and the UAE.`,
+    ].find((d) => d.length <= 150)
+  : '';
+
+// Link services to their Abu Dhabi landing page when one exists
+const serviceLink = (slug: string) => getLocalPage(slug, null)?.path ?? serviceUrl(slug);
+
+const schema = data
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      '@id': `${business.website}/industries/${data.slug}/#service`,
+      name: `HVAC Duct Manufacturing & Metal Fabrication for ${data.name}`,
+      serviceType: 'HVAC duct manufacturing and sheet metal fabrication',
+      description: data.description,
+      url: `${business.website}/industries/${data.slug}/`,
+      audience: { '@type': 'BusinessAudience', audienceType: data.name },
+      provider: businessRef(),
+      areaServed: { '@type': 'Country', name: 'United Arab Emirates' },
+    }
+  : undefined;
+
+const breadcrumbs = data
+  ? [{ label: 'Industries', href: '/industries/' }, { label: data.name }]
+  : undefined;
 ---
 
 {!data ? (
@@ -98,8 +133,10 @@ if (!data) {
   </BaseLayout>
 ) : (
   <BaseLayout
-    title={`${data.name} | HVAC Duct Manufacturing | ${business.name}`}
-    description={data.description}
+    title={pageTitle}
+    description={pageDescription}
+    schema={schema}
+    breadcrumbs={breadcrumbs}
   >
 
     <section class="relative -mt-28 flex min-h-[58vh] items-center overflow-hidden bg-brand-950 pt-32 pb-20 lg:-mt-[140px] lg:min-h-[60vh] lg:pt-40 lg:pb-24">
@@ -113,7 +150,7 @@ if (!data) {
         <span data-reveal class="inline-flex size-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm">
           <Icon name="lucide:building-2" class="size-7" />
         </span>
-        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">{data.name}</h1>
+        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">HVAC Ductwork &amp; Fabrication for {data.name}</h1>
         <p data-reveal style="--reveal-delay: 160ms" class="mt-5 max-w-2xl text-lg leading-relaxed text-brand-100">{data.description}</p>
       </div>
     </section>
@@ -145,7 +182,7 @@ if (!data) {
                   if (!svc) return null;
                   return (
                     <li>
-                      <a href={serviceUrl(svc.slug)} class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-brand-50 hover:text-brand-700">
+                      <a href={serviceLink(svc.slug)} class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-brand-50 hover:text-brand-700">
                         <span class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:text-white group-hover:ring-brand-500">
                           <Icon name="lucide:arrow-right" class="size-3.5 transition-transform group-hover:translate-x-0.5" />
                         </span>
@@ -184,7 +221,7 @@ if (!data) {
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
             <Icon name="lucide:phone" class="size-4" />{business.phone}
           </a>
-          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-500">
+          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600">
             <Icon name="lucide:message-circle" class="size-4" />WhatsApp
           </a>
           <a href={contactUrl()} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">

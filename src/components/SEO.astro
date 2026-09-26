@@ -11,7 +11,7 @@ interface Props {
 }
 
 const SITE_NAME = business.name;
-const DEFAULT_OG_IMAGE = '/images/logo.png';
+const DEFAULT_OG_IMAGE = business.ogImage;
 
 const {
   title: rawTitle,
@@ -22,10 +22,13 @@ const {
   noindex = false,
 } = Astro.props;
 
-// Auto-append site name to title if not already present
-const title = rawTitle.includes(SITE_NAME)
+// Auto-append site name when missing, but only if the title stays within
+// the ~60 characters Google shows in results
+const MAX_TITLE = 60;
+const branded = `${rawTitle} | ${SITE_NAME}`;
+const title = rawTitle.includes(SITE_NAME) || branded.length > MAX_TITLE
   ? rawTitle
-  : `${rawTitle} | ${SITE_NAME}`;
+  : branded;
 
 // Auto-construct canonical from the current request URL when not provided
 const canonical = canonicalUrl || new URL(Astro.url.pathname, Astro.site).href;

@@ -6,6 +6,10 @@ import { serviceAreas } from '../../data/serviceAreas';
 import { serviceUrl, areaUrl, contactUrl } from '../../lib/urls';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SeoFaq from '../../components/SeoFaq.astro';
+import LocalPageLinks from '../../components/LocalPageLinks.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import { getLocalPagesForService, hubTitle, hubDescription } from '../../data/localPages';
+import { serviceSchema, areaServedList } from '../../lib/schema';
 
 import type { ServiceType } from '../../data/serviceTypes';
 
@@ -23,41 +27,25 @@ interface Props {
 const { service } = Astro.props;
 const years = yearsInBusiness();
 
-const pageTitle = `${service.name} | ${business.name} — Abu Dhabi, UAE`;
-const metaDescription = service.description.length > 155
-  ? service.description.slice(0, 152) + '...'
-  : service.description;
+const pageTitle = hubTitle(service.slug);
+const metaDescription = hubDescription(service.slug);
 
-const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
+const schema = serviceSchema({
+  url: serviceUrl(service.slug),
   name: service.name,
+  serviceType: service.name,
   description: service.description,
-  provider: {
-    '@type': 'HVACBusiness',
-    name: business.name,
-    telephone: business.phone,
-    url: business.website,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: business.address.street,
-      addressLocality: business.address.city,
-      addressRegion: business.address.state,
-      addressCountry: 'AE',
-    },
-  },
-  areaServed: serviceAreas.map((area) => ({
-    '@type': 'City',
-    name: area.name,
-    containedInPlace: {
-      '@type': 'AdministrativeArea',
-      name: area.county,
-    },
-  })),
-};
+  image: service.image,
+  areaServed: areaServedList(),
+});
+
+const breadcrumbs = [
+  { label: 'Services', href: '/services/' },
+  { label: service.name },
+];
 ---
 
-<BaseLayout title={pageTitle} description={metaDescription} schema={schema}>
+<BaseLayout title={pageTitle} description={metaDescription} schema={schema} breadcrumbs={breadcrumbs}>
 
   <!-- ===== HERO ===== -->
   <section class="relative -mt-24 overflow-hidden bg-brand-950 pt-32 pb-20 lg:-mt-[108px] lg:pt-40 lg:pb-28">
@@ -173,6 +161,14 @@ const schema = {
       </div>
     </div>
   </section>
+
+  <LocalPageLinks
+    pages={getLocalPagesForService(service.slug)}
+    heading={`${service.name} by Location`}
+    intro={`Local details, delivery and FAQs for ${service.name.toLowerCase()} in each area we serve:`}
+  />
+
+  <RelatedPosts serviceSlug={service.slug} />
 
   <div class="border-t border-stone-200/60 bg-white">
     <SeoFaq service={service} />

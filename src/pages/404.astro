@@ -1,0 +1,38 @@
+---
+// Cloudflare Pages serves dist/404.html with a real 404 status for unknown URLs.
+// Without this file Pages falls back to index.html with a 200 (soft 404).
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { business } from '../data/business';
+import { serviceTypes } from '../data/serviceTypes';
+import { serviceUrl, contactUrl } from '../lib/urls';
+---
+
+<BaseLayout
+  title="Page Not Found"
+  description="The page you are looking for could not be found. Browse Duct Masters fabrication services or contact our Musaffah facility."
+  noindex
+>
+  <section class="mx-auto max-w-3xl px-5 py-24 text-center lg:py-32">
+    <p class="text-sm font-semibold uppercase tracking-wider text-accent-600">Error 404</p>
+    <h1 class="mt-3 font-display text-4xl font-bold tracking-tight text-brand-900 sm:text-5xl">Page Not Found</h1>
+    <p class="mx-auto mt-5 max-w-xl text-stone-600">
+      The page you requested does not exist or has moved. Try one of our services below, or call us on {business.phone}.
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a href="/" class="btn-shine inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30">
+        <Icon name="lucide:home" class="size-4" />Return Home
+      </a>
+      <a href={contactUrl()} class="inline-flex items-center gap-2 rounded-xl border border-stone-300 px-6 py-3.5 text-sm font-semibold text-stone-700 hover:border-brand-300 hover:text-brand-700">
+        <Icon name="lucide:file-text" class="size-4" />Request a Quote
+      </a>
+    </div>
+    <ul class="mt-12 flex flex-wrap justify-center gap-3">
+      {serviceTypes.map((service) => (
+        <li>
+          <a href={serviceUrl(service.slug)} class="inline-flex rounded-full border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 hover:border-brand-300 hover:text-brand-700">{service.name}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
