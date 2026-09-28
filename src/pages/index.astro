@@ -5,42 +5,52 @@ import { business, yearsInBusiness } from '../data/business';
 import { serviceTypes } from '../data/serviceTypes';
 import { serviceAreas } from '../data/serviceAreas';
 import { serviceUrl, areaUrl, contactUrl } from '../lib/urls';
+import { businessEntity, businessRef, WEBSITE_ID } from '../lib/schema';
 
 const years = yearsInBusiness();
 
 const galleryImages = [
   { src: '/images/gallery/laser-machine-operator.webp', alt: 'CNC laser cutting machine in operation at Duct Masters' },
-  { src: '/images/gallery/technician_inspecting_hvac_duct_….webp', alt: 'Quality inspection of HVAC ductwork' },
-  { src: '/images/gallery/workers_collaborating_on_metal_f….webp', alt: 'Metal component fabrication at Musaffah facility' },
-  { src: '/images/gallery/engineers_reviewing_drawings_in_….webp', alt: 'Engineers reviewing fabrication drawings' },
+  { src: '/images/gallery/technician-inspecting-hvac-duct.webp', alt: 'Quality inspection of HVAC ductwork' },
+  { src: '/images/gallery/workers-collaborating-metal-fabrication.webp', alt: 'Metal component fabrication at Musaffah facility' },
+  { src: '/images/gallery/engineers-reviewing-drawings.webp', alt: 'Engineers reviewing fabrication drawings' },
   { src: '/images/gallery/logo-on-uniform.webp', alt: 'Duct Masters factory team' },
   { src: '/images/gallery/preparing-components.webp', alt: 'Preparing metal components for fabrication' },
   { src: '/images/gallery/factory-uniforms.webp', alt: 'Duct Masters workshop team in uniform' },
-  { src: '/images/gallery/workers_handling_metal_sheets_wo….webp', alt: 'Handling sheet metal at Duct Masters facility' },
+  { src: '/images/gallery/workers-handling-metal-sheets.webp', alt: 'Handling sheet metal at Duct Masters facility' },
 ];
 
 const stats = [
   { count: years, suffix: '+', en: 'Years Experience', ar: 'سنوات الخبرة', icon: 'lucide:award' },
-  { count: 10, suffix: '', en: 'Fabrication Services', ar: 'خدمات التشكيل', icon: 'lucide:settings' },
+  { count: serviceTypes.length, suffix: '', en: 'Fabrication Services', ar: 'خدمات التشكيل', icon: 'lucide:settings' },
   { text: 'M-40', en: 'Musaffah Facility', ar: 'منشأة مصفح', icon: 'lucide:map-pin' },
   { text: 'UAE', en: 'Licensed Manufacturer', ar: 'مرخص في الإمارات', icon: 'lucide:shield-check' },
 ];
 
-const gbp = business.googleBusinessProfile
-  ? { sameAs: [business.googleBusinessProfile] }
-  : {};
+const pageTitle = `HVAC Duct Manufacturing Abu Dhabi | ${business.name}`;
+const pageDescription = `HVAC duct and sheet metal fabrication in M-40 Musaffah, Abu Dhabi since ${business.yearEstablished}. Custom ductwork for UAE projects. Call ${business.phone}.`;
 
 const schema = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'WebSite', '@id': `${business.website}/#website`, url: business.website, name: business.name, description: business.description, publisher: { '@id': `${business.website}/#business` } },
-    { '@type': 'HVACBusiness', '@id': `${business.website}/#business`, name: business.name, legalName: business.legalName, url: business.website, telephone: business.phone, email: business.email, description: business.description, foundingDate: `${business.yearEstablished}`, ...gbp, address: { '@type': 'PostalAddress', streetAddress: business.address.street, addressLocality: business.address.city, addressRegion: business.address.state, addressCountry: 'AE' }, geo: { '@type': 'GeoCoordinates', latitude: business.coordinates.lat, longitude: business.coordinates.lng }, openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], opens: '08:00', closes: '17:00' }], areaServed: serviceAreas.filter(a => a.featured).map((area) => ({ '@type': 'City', name: area.name, containedInPlace: { '@type': 'AdministrativeArea', name: area.county } })), hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Fabrication Services', itemListElement: serviceTypes.map(s => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name, description: s.description } })) } },
-    { '@type': 'WebPage', '@id': `${business.website}/#webpage`, url: business.website, name: `${business.name} | HVAC Duct Manufacturing Abu Dhabi`, isPartOf: { '@id': `${business.website}/#website` }, about: { '@id': `${business.website}/#business` }, description: business.description },
+    { '@type': 'WebSite', '@id': WEBSITE_ID, url: `${business.website}/`, name: business.name, description: business.description, publisher: businessRef() },
+    {
+      ...businessEntity(),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Fabrication Services',
+        itemListElement: serviceTypes.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', '@id': `${business.website}${serviceUrl(s.slug)}#service`, name: s.name, url: `${business.website}${serviceUrl(s.slug)}` },
+        })),
+      },
+    },
+    { '@type': 'WebPage', '@id': `${business.website}/#webpage`, url: `${business.website}/`, name: pageTitle, isPartOf: { '@id': WEBSITE_ID }, about: businessRef(), description: pageDescription },
   ],
 };
 ---
 
-<BaseLayout title={`${business.name} | HVAC Duct Manufacturing & Sheet Metal Fabrication Abu Dhabi`} description={business.description} schema={schema}>
+<BaseLayout title={pageTitle} description={pageDescription} schema={schema}>
 
   <!-- HERO -->
   <section class="relative -mt-28 flex min-h-[100vh] items-center overflow-hidden bg-brand-950 lg:-mt-[140px]">
@@ -64,7 +74,7 @@ const schema = {
         </span>
         <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
           <span class="bilingual" data-lang-en="HVAC Duct Manufacturing" data-lang-ar="تصنيع مجاري الهواء">HVAC Duct Manufacturing</span><br />
-          <span class="bilingual text-gradient" data-lang-en="&amp; Sheet Metal Fabrication" data-lang-ar="وتشكيل الصفائح المعدنية">&amp; Sheet Metal Fabrication</span>
+          <span class="bilingual text-gradient" data-lang-en="&amp; Sheet Metal Fabrication in Abu Dhabi" data-lang-ar="وتشكيل الصفائح المعدنية في أبوظبي">&amp; Sheet Metal Fabrication in Abu Dhabi</span>
         </h1>
         <p data-reveal style="--reveal-delay: 160ms" class="bilingual mt-7 max-w-xl text-lg leading-relaxed text-brand-200" data-lang-en="{business.tagline}. Custom ductwork and precision metal fabrication for commercial, industrial, and infrastructure projects — backed by {years}+ years in the UAE." data-lang-ar="{business.tagline}. تصنيع مجاري الهواء وتشكيل المعادن الدقيق للمشاريع التجارية والصناعية والبنية التحتية — بخبرة تتجاوز {years} عاماً في الإمارات.">{business.tagline}. Custom ductwork and precision metal fabrication for commercial, industrial, and infrastructure projects — backed by {years}+ years in the UAE.</p>
         <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
@@ -95,7 +105,7 @@ const schema = {
             <Icon name={stat.icon} class="size-6 text-accent-400" />
           </div>
           <span class="mt-4 font-display text-4xl font-bold text-white sm:text-5xl">
-            {stat.count !== undefined ? (<><span data-count={stat.count}>0</span>{stat.suffix}</>) : stat.text}
+            {stat.count !== undefined ? (<><span data-count={stat.count}>{stat.count}</span>{stat.suffix}</>) : stat.text}
           </span>
           <span class="bilingual mt-1.5 text-xs font-medium uppercase tracking-wider text-brand-300" data-lang-en={stat.en} data-lang-ar={stat.ar}>{stat.en}</span>
         </div>
@@ -152,11 +162,11 @@ const schema = {
         <div data-reveal="left" class="relative">
           <div class="absolute -left-6 -top-6 h-28 w-28 rounded-2xl border border-brand-200 dot-grid opacity-70"></div>
           <div class="relative overflow-hidden rounded-3xl shadow-2xl shadow-brand-900/20 ring-1 ring-stone-900/5">
-            <img src="/images/gallery/workers_collaborating_on_metal_f….webp" alt="Duct Masters fabrication team at work" class="w-full object-cover" width="1200" height="670" loading="lazy" />
+            <img src="/images/gallery/workers-collaborating-metal-fabrication.webp" alt="Duct Masters fabrication team at work" class="w-full object-cover" width="1200" height="670" loading="lazy" />
             <div class="absolute inset-0 bg-gradient-to-t from-brand-950/30 to-transparent"></div>
           </div>
           <div class="absolute -bottom-6 -right-6 hidden rounded-2xl bg-gradient-to-br from-brand-800 to-brand-950 p-6 shadow-xl ring-1 ring-white/10 lg:block">
-            <span class="font-display text-4xl font-bold text-white"><span data-count={years}>0</span>+</span>
+            <span class="font-display text-4xl font-bold text-white"><span data-count={years}>{years}</span>+</span>
             <p class="bilingual mt-1 text-xs text-brand-300" data-lang-en="Years in UAE" data-lang-ar="عاماً في الإمارات">Years in UAE</p>
           </div>
         </div>
@@ -265,7 +275,7 @@ const schema = {
 
   <!-- CTA -->
   <section class="relative overflow-hidden bg-brand-950">
-    <div class="absolute inset-0"><img src="/images/gallery/workers_fabricating_sheet_metal_….webp" alt="Duct Masters fabrication workshop" class="h-full w-full object-cover opacity-20" width="1200" height="670" loading="lazy" /></div>
+    <div class="absolute inset-0"><img src="/images/gallery/workers-fabricating-sheet-metal.webp" alt="Duct Masters fabrication workshop" class="h-full w-full object-cover opacity-20" width="1200" height="670" loading="lazy" /></div>
     <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/85 to-brand-950/70"></div>
     <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
     <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>

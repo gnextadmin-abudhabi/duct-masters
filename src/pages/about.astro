@@ -11,22 +11,7 @@ const aboutSchema = {
   '@type': 'AboutPage',
   name: `About ${business.name}`,
   description: `${business.name} is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company. Learn about our facility, capabilities, and ${years}+ years of experience serving the UAE.`,
-  about: {
-    '@type': 'HVACBusiness',
-    '@id': `${business.website}/#business`,
-    name: business.name,
-    legalName: business.legalName,
-    foundingDate: `${business.yearEstablished}`,
-    url: business.website,
-    telephone: business.phone,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: business.address.street,
-      addressLocality: business.address.city,
-      addressRegion: business.address.state,
-      addressCountry: 'AE',
-    },
-  },
+  about: { '@id': `${business.website}/#business` },
 };
 
 const values = [
@@ -45,9 +30,10 @@ const quickFacts = [
 ---
 
 <BaseLayout
-  title={`About ${business.name} | HVAC Duct Manufacturing Abu Dhabi`}
-  description={`${business.name} is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company. Learn about our facility, capabilities, and ${years}+ years of experience serving the UAE.`}
+  title={`About ${business.name} | HVAC Duct Manufacturer Abu Dhabi`}
+  description={`${business.name} has made HVAC ductwork and sheet metal parts in M-40 Musaffah, Abu Dhabi since ${business.yearEstablished}. Our facility, team and capabilities.`}
   schema={aboutSchema}
+  breadcrumbs={[{ label: 'About' }]}
 >
   <!-- Hero -->
   <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">

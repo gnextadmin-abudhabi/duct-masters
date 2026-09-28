@@ -1,0 +1,40 @@
+---
+// Grid of links to service × location landing pages (see src/data/localPages.ts).
+import { Icon } from 'astro-icon/components';
+import { localPageLabel } from '../data/localPages';
+import type { LocalPage } from '../data/localPages';
+
+interface Props {
+  pages: LocalPage[];
+  heading: string;
+  intro?: string;
+  /** Path of the page rendering this block — excluded from the list */
+  currentPath?: string;
+}
+
+const { pages, heading, intro, currentPath } = Astro.props;
+const links = pages.filter((p) => p.path !== currentPath);
+---
+
+{links.length > 0 && (
+  <section class="border-t border-stone-200/60 bg-white py-16 lg:py-20">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 data-reveal class="font-display text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">{heading}</h2>
+      {intro && <p data-reveal style="--reveal-delay: 80ms" class="mt-3 max-w-2xl text-stone-600">{intro}</p>}
+      <ul class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {links.map((page) => (
+          <li>
+            <a
+              href={page.path}
+              class="group flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-semibold text-stone-800 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:bg-white hover:text-brand-800 hover:shadow-lg hover:shadow-brand-900/5"
+            >
+              <Icon name="lucide:map-pin" class="size-4 shrink-0 text-brand-600" />
+              <span>{localPageLabel(page)}</span>
+              <Icon name="lucide:arrow-right" class="ml-auto size-4 shrink-0 text-stone-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}

@@ -12,6 +12,14 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     readingTime: z.string().optional(),
     featured: z.boolean().default(false),
+    /** Shorter <title> when `title` is too long for search results (max 60 chars) */
+    seoTitle: z.string().max(60).optional(),
+    updatedDate: z.string().optional(),
+    /** Featured image path under /public and its alt text */
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    /** Related service slugs (src/data/serviceTypes.ts) — linked from the post and back */
+    services: z.array(z.string()).default([]),
   }),
 });
 

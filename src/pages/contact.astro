@@ -13,14 +13,15 @@ const contactSchema = {
 ---
 
 <BaseLayout
-  title={`Contact ${business.name} | HVAC Duct Manufacturing Abu Dhabi`}
-  description={`Contact ${business.name} in Musaffah, Abu Dhabi. Call ${business.phone} or email ${business.email} for HVAC duct manufacturing and sheet metal fabrication quotations.`}
+  title={`Contact ${business.name} | Duct Manufacturer Abu Dhabi`}
+  description={`Contact ${business.name}, M-40 Musaffah, Abu Dhabi. Call ${business.phone} or email ${business.email} for ductwork and fabrication quotes.`}
   schema={contactSchema}
+  breadcrumbs={[{ label: 'Contact' }]}
 >
   <!-- Hero -->
   <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">
     <div class="absolute inset-0">
-      <img src="/images/gallery/engineers-reviewing-drawings-in-….webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
+      <img src="/images/gallery/engineers-reviewing-drawings.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
       <div class="absolute inset-0 bg-gradient-to-b from-brand-950/92 via-brand-950/82 to-brand-950/96"></div>
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,_rgba(46,104,156,0.28),_transparent_70%)]"></div>
       <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
@@ -63,7 +64,7 @@ const contactSchema = {
                   href={business.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+                  class="mt-1 inline-flex min-h-6 items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
                 >
                   <Icon name="lucide:external-link" class="size-3.5" />
                   View on Google Maps
@@ -129,6 +130,7 @@ const contactSchema = {
                   type="text"
                   id="name"
                   name="name"
+                  maxlength="100"
                   required
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                   placeholder="Your name"
@@ -142,6 +144,7 @@ const contactSchema = {
                     type="email"
                     id="email"
                     name="email"
+                  maxlength="254"
                     required
                     class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                     placeholder="you@company.com"
@@ -153,6 +156,7 @@ const contactSchema = {
                     type="tel"
                     id="phone"
                     name="phone"
+                  maxlength="30"
                     class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                     placeholder="+971"
                   />
@@ -165,6 +169,7 @@ const contactSchema = {
                   type="text"
                   id="company"
                   name="company"
+                  maxlength="150"
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                   placeholder="Your company name"
                 />
@@ -197,6 +202,7 @@ const contactSchema = {
                 <textarea
                   id="message"
                   name="message"
+                  maxlength="5000"
                   rows="5"
                   required
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"

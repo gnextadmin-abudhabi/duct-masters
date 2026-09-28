@@ -1,26 +1,43 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { business, yearsInBusiness } from '../../data/business';
-import { serviceTypes, getServiceBySlug } from '../../data/serviceTypes';
-import { serviceAreas, getAreaBySlug, getNearbyAreas } from '../../data/serviceAreas';
-import type { ServiceArea } from '../../data/serviceAreas';
+import { getServiceBySlug } from '../../data/serviceTypes';
+import { getAreaBySlug, getNearbyAreas } from '../../data/serviceAreas';
 import { serviceUrl, areaUrl, contactUrl } from '../../lib/urls';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SeoFaq from '../../components/SeoFaq.astro';
+import LocalPageLinks from '../../components/LocalPageLinks.astro';
+import {
+  getLocalPage,
+  getLocalPagesForService,
+  getLocalPagesForArea,
+  localTitle,
+  localDescription,
+  localHeading,
+  localLead,
+} from '../../data/localPages';
+import { serviceSchema } from '../../lib/schema';
 
 interface Props {
   serviceSlug: string;
   areaSlug: string;
-  pageTitle: string;
-  pageDescription: string;
+  /** Optional overrides — defaults come from src/data/localPages.ts */
+  pageTitle?: string;
+  pageDescription?: string;
 }
 
-const { serviceSlug, areaSlug, pageTitle, pageDescription } = Astro.props;
+const { serviceSlug, areaSlug } = Astro.props;
 const service = getServiceBySlug(serviceSlug);
 const area = getAreaBySlug(areaSlug);
 const years = yearsInBusiness();
 const nearbyAreas = area ? getNearbyAreas(areaSlug) : [];
-const otherServices = service ? serviceTypes.filter(s => s.slug !== serviceSlug).slice(0, 4) : [];
+const pageTitle = Astro.props.pageTitle ?? localTitle(serviceSlug, areaSlug);
+const pageDescription = Astro.props.pageDescription ?? localDescription(serviceSlug, areaSlug);
+const heading = localHeading(serviceSlug, areaSlug);
+const currentPath = Astro.url.pathname;
+
+// Nearby zones link to this service's page for that zone when one exists
+const nearbyLink = (slug: string) => getLocalPage(serviceSlug, slug)?.path ?? areaUrl(slug);
 
 const images = [
   { src: '/images/gallery/factory-workshop.webp', alt: 'Duct Masters manufacturing facility' },
@@ -29,30 +46,28 @@ const images = [
 
 if (!service || !area) Astro.response.status = 404;
 
-const schema = (service && area) ? {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
-  name: `${service.name} in ${area.name}`,
-  description: pageDescription,
-  provider: {
-    '@type': 'HVACBusiness',
-    '@id': `${business.website}/#business`,
-    name: business.name,
-    telephone: business.phone,
-    url: business.website,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: business.address.street,
-      addressLocality: business.address.city,
-      addressRegion: business.address.state,
-      addressCountry: 'AE',
-    },
-  },
-  areaServed: {
-    '@type': 'City', name: area.name,
-    containedInPlace: { '@type': 'AdministrativeArea', name: area.county },
-  },
-} : undefined;
+const schema = (service && area)
+  ? serviceSchema({
+      url: currentPath,
+      name: heading,
+      serviceType: service.name,
+      description: pageDescription,
+      image: service.image,
+      areaServed: {
+        '@type': 'Place',
+        name: area.name,
+        containedInPlace: { '@type': 'AdministrativeArea', name: area.county },
+      },
+    })
+  : undefined;
+
+const breadcrumbs = (service && area)
+  ? [
+      { label: 'Services', href: '/services/' },
+      { label: service.name, href: serviceUrl(service.slug) },
+      { label: heading },
+    ]
+  : undefined;
 ---
 
 {(!service || !area) ? (
@@ -60,7 +75,7 @@ const schema = (service && area) ? {
     <div class="mx-auto max-w-3xl px-5 py-24 text-center"><h1 class="font-display text-4xl font-bold tracking-tight text-brand-900">Page Not Found</h1><a href="/" class="btn-shine mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30">Return Home</a></div>
   </BaseLayout>
 ) : (
-  <BaseLayout title={pageTitle} description={pageDescription} schema={schema}>
+  <BaseLayout title={pageTitle} description={pageDescription} schema={schema} breadcrumbs={breadcrumbs}>
 
     {/* HERO */}
     <section class="relative overflow-hidden bg-brand-950">
@@ -72,11 +87,11 @@ const schema = (service && area) ? {
       </div>
       <div class="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div data-reveal class="inline-flex items-center gap-2.5 rounded-full border border-accent-400/20 bg-white/5 px-4 py-1.5 text-accent-400 backdrop-blur-sm"><Icon name={service.icon} class="size-5" /><span class="text-sm font-semibold uppercase tracking-wide">{service.name} in {area.name}</span></div>
-        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">{pageTitle}</h1>
-        <p data-reveal style="--reveal-delay: 160ms" class="mt-6 max-w-3xl text-lg leading-relaxed text-brand-200">{pageDescription}</p>
+        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">{heading}</h1>
+        <p data-reveal style="--reveal-delay: 160ms" class="mt-6 max-w-3xl text-lg leading-relaxed text-brand-200">{localLead(serviceSlug, areaSlug)}</p>
         <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"><Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />Call {business.phone}</a>
-          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3.5 text-sm font-semibold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-green-500"><Icon name="lucide:message-circle" class="size-4" />WhatsApp</a>
+          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3.5 text-sm font-semibold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-green-600"><Icon name="lucide:message-circle" class="size-4" />WhatsApp</a>
           <a href={contactUrl()} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"><Icon name="lucide:file-text" class="size-4" />Request a Quote</a>
         </div>
       </div>
@@ -132,12 +147,23 @@ const schema = (service && area) ? {
           <h2 data-reveal class="text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">Nearby Industrial Zones</h2>
           <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {nearbyAreas.map((n, i) => (
-              <a href={areaUrl(n.slug)} data-reveal style={`--reveal-delay: ${(i % 4) * 80}ms`} class="group flex items-center gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:bg-white hover:shadow-lg hover:shadow-brand-900/5"><div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:ring-brand-500"><Icon name="lucide:map-pin" class="size-5 text-brand-600 transition-colors group-hover:text-white" /></div><div><p class="font-semibold text-stone-800 group-hover:text-brand-800">{n.name}</p><p class="mt-1 text-xs text-stone-500">{n.county}</p></div></a>
+              <a href={nearbyLink(n.slug)} data-reveal style={`--reveal-delay: ${(i % 4) * 80}ms`} class="group flex items-center gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:bg-white hover:shadow-lg hover:shadow-brand-900/5"><div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:ring-brand-500"><Icon name="lucide:map-pin" class="size-5 text-brand-600 transition-colors group-hover:text-white" /></div><div><p class="font-semibold text-stone-800 group-hover:text-brand-800">{n.name}</p><p class="mt-1 text-xs text-stone-500">{n.county}</p></div></a>
             ))}
           </div>
         </div>
       </section>
     )}
+
+    <LocalPageLinks
+      pages={getLocalPagesForService(service.slug)}
+      currentPath={currentPath}
+      heading={`${service.name} in Other Locations`}
+    />
+    <LocalPageLinks
+      pages={getLocalPagesForArea(area.slug)}
+      currentPath={currentPath}
+      heading={`More Fabrication Services in ${area.name}`}
+    />
 
     <div class="border-t border-stone-200/60 bg-white"><SeoFaq service={service} area={area} /></div>
 
@@ -154,7 +180,7 @@ const schema = (service && area) ? {
         <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-5 max-w-2xl text-lg text-brand-200">Send us your project requirements. We provide competitive quotations with detailed pricing, production timelines, and delivery to {area.name}.</p>
         <div data-reveal style="--reveal-delay: 160ms" class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"><Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" />{business.phone}</a>
-          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-500"><Icon name="lucide:message-circle" class="size-5" />WhatsApp</a>
+          <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600"><Icon name="lucide:message-circle" class="size-5" />WhatsApp</a>
           <a href={`mailto:${business.email}`} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"><Icon name="lucide:mail" class="size-5" />{business.email}</a>
         </div>
       </div>

@@ -19,10 +19,11 @@ import { t } from '../i18n/translations';
         <div class="max-w-md">
           <a href="/" class="inline-flex items-center gap-2.5">
             <img
-              src={business.logoWhite}
+              src="/images/logo-footer.png"
               alt="Duct Masters Logo"
               class="h-24 w-auto lg:h-32"
-              width="1441" height="935"
+              width="420" height="272"
+              loading="lazy"
             />
           </a>
           <p class="mt-4 text-sm leading-relaxed text-stone-400">
@@ -75,7 +76,7 @@ import { t } from '../i18n/translations';
         <h3 class="bilingual mb-4 text-xs font-semibold uppercase tracking-wider text-stone-500" data-lang-en="Fabrication Services" data-lang-ar="خدمات التشكيل">Fabrication Services</h3>
         <div class="grid gap-2.5 sm:grid-cols-2">
           {serviceTypes.map((service) => (
-            <a href={serviceUrl(service.slug)} class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group">
+            <a href={serviceUrl(service.slug)} class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group">
               <Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />
               {service.shortName}
             </a>
@@ -89,7 +90,7 @@ import { t } from '../i18n/translations';
         <ul class="space-y-2.5">
           {serviceAreas.filter(a => a.featured).map((area) => (
             <li>
-              <a href={areaUrl(area.slug)} class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group">
+              <a href={areaUrl(area.slug)} class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group">
                 <Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />
                 {area.name}
               </a>
@@ -102,12 +103,12 @@ import { t } from '../i18n/translations';
       <div>
         <h3 class="bilingual mb-4 text-xs font-semibold uppercase tracking-wider text-stone-500" data-lang-en="Company" data-lang-ar="الشركة">Company</h3>
         <ul class="space-y-2.5">
-          <li><a href="/about/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />About Us</a></li>
-          <li><a href="/services/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Services</a></li>
-          <li><a href="/areas/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Areas</a></li>
-          <li><a href="/industries/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Industries</a></li>
-          <li><a href="/blog/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Blog</a></li>
-          <li><a href="/contact/" class="text-sm text-stone-400 transition-colors hover:text-white flex items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Contact</a></li>
+          <li><a href="/about/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />About Us</a></li>
+          <li><a href="/services/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Services</a></li>
+          <li><a href="/areas/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Areas</a></li>
+          <li><a href="/industries/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Industries</a></li>
+          <li><a href="/blog/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Blog</a></li>
+          <li><a href="/contact/" class="text-sm text-stone-400 transition-colors hover:text-white flex min-h-6 items-center gap-2 group"><Icon name="lucide:chevron-right" class="size-3 text-stone-600 transition-colors group-hover:text-brand-400" />Contact</a></li>
         </ul>
       </div>
 
@@ -121,15 +122,15 @@ import { t } from '../i18n/translations';
           </li>
           <li class="flex items-start gap-2.5">
             <Icon name="lucide:phone" class="mt-0.5 size-4 shrink-0 text-stone-500" />
-            <a href={business.phoneHref} class="text-sm text-stone-400 transition-colors hover:text-white">{business.phone}</a>
+            <a href={business.phoneHref} class="inline-flex min-h-6 items-center text-sm text-stone-400 transition-colors hover:text-white">{business.phone}</a>
           </li>
           <li class="flex items-start gap-2.5">
             <Icon name="lucide:smartphone" class="mt-0.5 size-4 shrink-0 text-stone-500" />
-            <a href={`tel:${business.phoneSecondary.replace(/\s/g, '')}`} class="text-sm text-stone-400 transition-colors hover:text-white">{business.phoneSecondary}</a>
+            <a href={`tel:${business.phoneSecondary.replace(/\s/g, '')}`} class="inline-flex min-h-6 items-center text-sm text-stone-400 transition-colors hover:text-white">{business.phoneSecondary}</a>
           </li>
           <li class="flex items-start gap-2.5">
             <Icon name="lucide:mail" class="mt-0.5 size-4 shrink-0 text-stone-500" />
-            <a href={`mailto:${business.email}`} class="text-sm text-stone-400 transition-colors hover:text-white">{business.email}</a>
+            <a href={`mailto:${business.email}`} class="inline-flex min-h-6 items-center text-sm text-stone-400 transition-colors hover:text-white">{business.email}</a>
           </li>
           <li class="flex items-start gap-2.5">
             <Icon name="lucide:clock" class="mt-0.5 size-4 shrink-0 text-stone-500" />
@@ -146,7 +147,7 @@ import { t } from '../i18n/translations';
           href={business.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-500"
+          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-600"
         >
           <Icon name="lucide:message-circle" class="size-4" />
           <span class="bilingual" data-lang-en="Chat on WhatsApp" data-lang-ar="محادثة واتساب">Chat on WhatsApp</span>
@@ -162,7 +163,7 @@ import { t } from '../i18n/translations';
       <div class="flex items-center gap-4 text-xs text-stone-600">
         <span>HVAC Duct Manufacturing Abu Dhabi</span>
         <span class="text-stone-700">|</span>
-        <a href="https://gnext.ae" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-stone-400">Powered by gnext.ae</a>
+        <a href="https://gnext.ae" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-6 items-center transition-colors hover:text-stone-400">Powered by gnext.ae</a>
       </div>
     </div>
   </div>

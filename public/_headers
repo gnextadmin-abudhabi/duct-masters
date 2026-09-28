@@ -1,5 +1,11 @@
 # Cloudflare Pages — Security Headers
 # Applied to all static assets and Function responses
+#
+# Content-Security-Policy (enforced) holds only directives that cannot break
+# third-party tags. Content-Security-Policy-Report-Only holds the full
+# allow-list: check the browser console for violations from GTM-loaded tags,
+# then promote it to the enforced header. (The old rule targeted /*.html,
+# which never matched because pages are served as /path/.)
 
 /*
   X-Frame-Options: DENY
@@ -7,10 +13,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
-
-# HTML pages only — CSP
-/*.html
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-src https://www.google.com;
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://cloudflareinsights.com; frame-src https://www.google.com https://www.googletagmanager.com; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'
 
 # API endpoint — allow JSON
 /api/*

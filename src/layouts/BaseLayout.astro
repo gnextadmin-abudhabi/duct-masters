@@ -2,6 +2,7 @@
 import SEO from '../components/SEO.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -11,9 +12,11 @@ interface Props {
   ogImage?: string;
   schema?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
+  /** Trail after "Home"; the last crumb has no href. Renders a BreadcrumbList. */
+  breadcrumbs?: { label: string; href?: string }[];
 }
 
-const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.props;
+const { title, description, canonicalUrl, ogImage, schema, noindex, breadcrumbs } = Astro.props;
 ---
 
 <!doctype html>
@@ -30,10 +33,13 @@ const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.pro
     <!-- Google Fonts: DM Serif Display + DM Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Loaded without blocking first render (display=swap keeps text visible) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" /></noscript>
+
+    <!-- Header logo is the LCP element on most pages -->
+    <link rel="preload" as="image" href="/images/logo-header.png" fetchpriority="high" />
 
     <!-- SEO Head (title, meta, OG, Twitter, schema) -->
     <SEO
@@ -46,7 +52,7 @@ const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.pro
     />
 
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5JPGDSB5');</script>
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5JPGDSB5');</script>
     <!-- End Google Tag Manager -->
   </head>
 
@@ -57,6 +63,11 @@ const { title, description, canonicalUrl, ogImage, schema, noindex } = Astro.pro
     <Header />
     <main class="flex-1">
       <slot />
+      {breadcrumbs && breadcrumbs.length > 0 && (
+        <div class="border-t border-stone-200/60 bg-white">
+          <Breadcrumbs crumbs={breadcrumbs} />
+        </div>
+      )}
     </main>
     <Footer />
 
