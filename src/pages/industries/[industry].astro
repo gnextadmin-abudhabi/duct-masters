@@ -92,13 +92,13 @@ if (!data) {
 
 const pageTitle = data
   ? [`Ductwork & Fabrication for ${data.name} | ${business.name}`, `Ductwork for ${data.name} | ${business.name}`, `Ductwork for ${data.name}`]
-      .find((t) => t.length <= 60)
-  : '';
+      .find((t) => t.length <= 60) ?? data.name
+  : 'Page Not Found';
 const pageDescription = data
   ? [
       `HVAC ductwork and metal fabrication for ${data.name} in Abu Dhabi and the UAE, made at our M-40 Musaffah factory.`,
       `HVAC ductwork and metal fabrication for ${data.name} across Abu Dhabi and the UAE.`,
-    ].find((d) => d.length <= 150)
+    ].find((d) => d.length <= 150) ?? data.description
   : '';
 
 // Link services to their Abu Dhabi landing page when one exists

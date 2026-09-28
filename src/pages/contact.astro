@@ -64,7 +64,7 @@ const contactSchema = {
                   href={business.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+                  class="mt-1 inline-flex min-h-6 items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
                 >
                   <Icon name="lucide:external-link" class="size-3.5" />
                   View on Google Maps
@@ -130,6 +130,7 @@ const contactSchema = {
                   type="text"
                   id="name"
                   name="name"
+                  maxlength="100"
                   required
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                   placeholder="Your name"
@@ -143,6 +144,7 @@ const contactSchema = {
                     type="email"
                     id="email"
                     name="email"
+                  maxlength="254"
                     required
                     class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                     placeholder="you@company.com"
@@ -154,6 +156,7 @@ const contactSchema = {
                     type="tel"
                     id="phone"
                     name="phone"
+                  maxlength="30"
                     class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                     placeholder="+971"
                   />
@@ -166,6 +169,7 @@ const contactSchema = {
                   type="text"
                   id="company"
                   name="company"
+                  maxlength="150"
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                   placeholder="Your company name"
                 />
@@ -198,6 +202,7 @@ const contactSchema = {
                 <textarea
                   id="message"
                   name="message"
+                  maxlength="5000"
                   rows="5"
                   required
                   class="mt-1 block w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:ring-1 focus:ring-accent-500"

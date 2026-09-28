@@ -39,6 +39,27 @@ function cleanupStale(): void {
   }
 }
 
+// Max characters per field — matches the maxlength attributes on /contact/
+const LIMITS: Record<string, number> = {
+  name: 100,
+  email: 254,
+  phone: 30,
+  company: 150,
+  service: 100,
+  message: 5000,
+};
+
+/** Only accept posts from this site (same host), e.g. not from a form on another domain. */
+function isSameOrigin(request: Request): boolean {
+  const origin = request.headers.get('Origin');
+  if (!origin) return true; // non-browser clients; still rate limited and validated
+  try {
+    return new URL(origin).host === new URL(request.url).host;
+  } catch {
+    return false;
+  }
+}
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -56,6 +77,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
   const { request, env } = context;
   try {
     // Rate limit check
+    if (!isSameOrigin(request)) {
+      return json({ ok: false, error: 'Forbidden.' }, 403);
+    }
+
     const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
     cleanupStale();
     if (!checkRateLimit(ip)) {
@@ -74,6 +99,12 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
     const company = get('company');
     const service = get('service');
     const message = get('message');
+
+    for (const [field, max] of Object.entries(LIMITS)) {
+      if (get(field).length > max) {
+        return json({ ok: false, error: `The ${field} field is too long (max ${max} characters).` }, 400);
+      }
+    }
 
     if (!name || !email || !message) {
       return json({ ok: false, error: 'Please fill in your name, email, and project details.' }, 400);
@@ -130,7 +161,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
         from: FROM,
         to: RECIPIENTS,
         reply_to: email,
-        subject: `New inquiry from ${name}${service ? ` — ${service}` : ''}`,
+        // Strip line breaks so user input cannot add lines to the subject
+        subject: `New inquiry from ${name}${service ? ` — ${service}` : ''}`.replace(/[\r\n]+/g, ' '),
         html,
         text,
       }),
