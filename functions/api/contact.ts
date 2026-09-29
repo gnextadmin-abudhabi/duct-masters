@@ -5,10 +5,24 @@
 // Required env var (Cloudflare Pages → Settings → Environment variables):
 //   RESEND_API_KEY  — your Resend API key (secret)
 //
+// Optional D1 binding (Cloudflare Pages → Settings → Bindings):
+//   DB  — D1 database `ductmasters-enquiries` (schema: migrations/0001_create_enquiries.sql).
+//   Every valid submission is saved before the email is sent, so enquiries are
+//   kept even if email delivery fails. View them in Cloudflare → D1 → Console.
+//
 // The "from" domain must be verified in Resend. We send from gnext.space (verified).
+
+// Minimal D1 types (avoids a @cloudflare/workers-types dependency)
+interface D1Result { meta?: { last_row_id?: number } }
+interface D1PreparedStatement {
+  bind(...values: unknown[]): D1PreparedStatement;
+  run(): Promise<D1Result>;
+}
+interface D1Database { prepare(query: string): D1PreparedStatement }
 
 interface Env {
   RESEND_API_KEY?: string;
+  DB?: D1Database;
 }
 
 const RECIPIENTS = ['gm@ductmasters.ae', 'md@ductmasters.ae', 'info@ductmasters.ae'];
@@ -73,6 +87,41 @@ function esc(s: string): string {
   );
 }
 
+/** Save the enquiry; returns its row id, or null if storage is unavailable. Never throws. */
+async function saveEnquiry(db: D1Database | undefined, e: Record<string, string>): Promise<number | null> {
+  if (!db) return null;
+  try {
+    const res = await db
+      .prepare(
+        'INSERT INTO enquiries (name, email, phone, company, service, message, page, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+      )
+      .bind(e.name, e.email, e.phone || null, e.company || null, e.service || null, e.message, e.page || null, e.country || null)
+      .run();
+    return res.meta?.last_row_id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function setEmailStatus(db: D1Database | undefined, id: number | null, status: string): Promise<void> {
+  if (!db || id === null) return;
+  try {
+    await db.prepare('UPDATE enquiries SET email_status = ? WHERE id = ?').bind(status, id).run();
+  } catch {
+    /* storage problems must not affect the visitor */
+  }
+}
+
+/** Path of the page the form was sent from (Referer), same site only. */
+function sourcePage(request: Request): string {
+  try {
+    const ref = new URL(request.headers.get('Referer') ?? '');
+    return ref.host === new URL(request.url).host ? ref.pathname.slice(0, 200) : '';
+  } catch {
+    return '';
+  }
+}
+
 export const onRequestPost = async (context: { request: Request; env: Env }): Promise<Response> => {
   const { request, env } = context;
   try {
@@ -112,7 +161,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       return json({ ok: false, error: 'Please enter a valid email address.' }, 400);
     }
+    // Save first, so the enquiry survives an email failure
+    const country = (request as Request & { cf?: { country?: string } }).cf?.country ?? '';
+    const enquiryId = await saveEnquiry(env.DB, {
+      name, email, phone, company, service, message, page: sourcePage(request), country,
+    });
+
     if (!env.RESEND_API_KEY) {
+      await setEmailStatus(env.DB, enquiryId, 'not_configured');
+      // Stored but not emailed — still tell the visitor it was received if we saved it
+      if (enquiryId !== null) return json({ ok: true });
       return json({ ok: false, error: 'Email service is not configured yet. Please call or WhatsApp us.' }, 500);
     }
 
@@ -166,9 +224,14 @@ export const onRequestPost = async (context: { request: Request; env: Env }): Pr
         html,
         text,
       }),
-    });
+    }).catch(() => null); // network failure → treated like a failed send
 
-    if (!res.ok) {
+    const sent = !!res?.ok;
+    await setEmailStatus(env.DB, enquiryId, sent ? 'sent' : 'failed');
+
+    if (!sent) {
+      // The enquiry is stored, so the team can still follow it up
+      if (enquiryId !== null) return json({ ok: true });
       return json(
         { ok: false, error: 'Sorry, we could not send your message right now. Please call or WhatsApp us.' },
         502
