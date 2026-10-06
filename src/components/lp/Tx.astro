@@ -1,0 +1,15 @@
+---
+// Bilingual text for landing pages. Renders English; LandingLayout swaps to
+// Arabic client-side. Text only (no markup) — the swap uses textContent.
+interface Props {
+  en: string;
+  ar: string;
+  tag?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'li' | 'strong' | 'div' | 'summary';
+  class?: string;
+}
+
+const { en, ar, tag = 'span', class: className } = Astro.props;
+const Tag = tag;
+---
+
+<Tag class:list={['bilingual', className]} data-lang-en={en} data-lang-ar={ar}>{en}</Tag>

@@ -11,7 +11,8 @@ export default defineConfig({
   integrations: [
     icon(),
     sitemap({
-      filter: (page) => !page.includes('/admin/') && !page.includes('/api/'),
+      // /lp/ = paid-traffic landing pages (noindex)
+      filter: (page) => !page.includes('/admin/') && !page.includes('/api/') && !page.includes('/lp/'),
       changefreq: 'weekly',
       priority: 0.7,
     }),

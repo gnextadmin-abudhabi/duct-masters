@@ -1,0 +1,517 @@
+---
+// Google Ads landing page — HVAC duct manufacturing (EN/AR).
+// noindex + excluded from the sitemap so it doesn't compete with the homepage
+// in organic search. Arabic ad groups can link to ?lang=ar.
+import LandingLayout from '../../layouts/LandingLayout.astro';
+import Tx from '../../components/lp/Tx.astro';
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness } from '../../data/business';
+
+const years = yearsInBusiness();
+const waNumber = business.whatsapp.replace('https://wa.me/', '');
+const waEn = `https://wa.me/${waNumber}?text=${encodeURIComponent('Hello Duct Masters, I would like a quote for HVAC duct manufacturing.')}`;
+const waAr = `https://wa.me/${waNumber}?text=${encodeURIComponent('مرحباً دكت ماسترز، أود الحصول على عرض سعر لتصنيع مجاري الهواء.')}`;
+const mapEmbed = `https://www.google.com/maps?q=${business.coordinates.lat},${business.coordinates.lng}&z=15&output=embed`;
+
+const trust = [
+  { icon: 'lucide:badge-check', en: 'ISO Certified', ar: 'حاصلة على شهادة ISO' },
+  { icon: 'lucide:factory', en: '100% In-House Manufacturing', ar: 'تصنيع داخلي بالكامل' },
+  { icon: 'lucide:award', en: `${years}+ Years in the UAE`, ar: `أكثر من ${years} عاماً في الإمارات` },
+  { icon: 'lucide:ruler', en: 'Built to SMACNA Standards', ar: 'وفق معايير SMACNA' },
+];
+
+const products = [
+  {
+    icon: 'lucide:square',
+    en: 'Rectangular Ductwork', ar: 'مجاري هواء مستطيلة',
+    dEn: 'GI rectangular ducts in all sizes and gauges, Pittsburgh seam locked and reinforced to spec.',
+    dAr: 'مجاري مستطيلة من الحديد المجلفن بجميع المقاسات والسماكات، بوصلات بيتسبرغ وتدعيم حسب المواصفات.',
+  },
+  {
+    icon: 'lucide:circle',
+    en: 'Round & Oval Ducts', ar: 'مجاري دائرية وبيضاوية',
+    dEn: 'Round and oval duct sections for supply, return and exhaust air systems.',
+    dAr: 'مقاطع مجاري دائرية وبيضاوية لأنظمة الهواء المزوّد والراجع والعادم.',
+  },
+  {
+    icon: 'lucide:shield',
+    en: 'Stainless Steel & Aluminium', ar: 'ستانلس ستيل وألمنيوم',
+    dEn: 'Stainless steel and aluminium ducting for kitchen exhaust, corrosive and special applications.',
+    dAr: 'مجاري من الستانلس ستيل والألمنيوم لشفط المطابخ والبيئات المسببة للتآكل والتطبيقات الخاصة.',
+  },
+  {
+    icon: 'lucide:git-fork',
+    en: 'Fittings & Accessories', ar: 'القطع والملحقات',
+    dEn: 'Elbows, reducers, take-offs, transitions, dampers and plenums made to your drawings.',
+    dAr: 'أكواع ومخفضات ووصلات تفرع وقطع انتقالية ودامبرات وصناديق توزيع حسب رسوماتك.',
+  },
+];
+
+const steps = [
+  { en: 'Drawing Review', ar: 'مراجعة الرسومات', dEn: 'We check your HVAC drawings for sizing, routing and fabrication requirements.', dAr: 'نراجع رسومات التكييف لتحديد المقاسات والمسارات ومتطلبات التصنيع.' },
+  { en: 'Material Preparation', ar: 'تجهيز المواد', dEn: 'GI, stainless steel or aluminium sheet selected and prepared to the specified gauge.', dAr: 'اختيار وتجهيز صفائح الحديد المجلفن أو الستانلس ستيل أو الألمنيوم بالسماكة المطلوبة.' },
+  { en: 'Fabrication', ar: 'التصنيع', dEn: 'Cutting, CNC forming and seam locking — all on our own machines in Musaffah.', dAr: 'القص والتشكيل بماكينات CNC وإقفال الوصلات — كلها على ماكيناتنا في مصفح.' },
+  { en: 'Quality Check', ar: 'فحص الجودة', dEn: 'Dimensional checks, leakage testing where required, and final QC before dispatch.', dAr: 'فحص الأبعاد واختبار التسرب عند الحاجة وفحص نهائي قبل الشحن.' },
+  { en: 'Delivery to Site', ar: 'التسليم للموقع', dEn: 'Packed and delivered to your project anywhere in Abu Dhabi and the UAE.', dAr: 'تغليف وتسليم إلى موقع مشروعك في أي مكان في أبوظبي والإمارات.' },
+];
+
+const gallery = [
+  { src: '/images/gallery/workers-fabricating-hvac-ducts.webp', en: 'HVAC ducts being fabricated in our Musaffah workshop', ar: 'تصنيع مجاري التكييف في ورشتنا في مصفح' },
+  { src: '/images/gallery/technician-inspecting-hvac-duct.webp', en: 'Quality inspection of finished ductwork', ar: 'فحص جودة مجاري الهواء الجاهزة' },
+  { src: '/images/gallery/technician-operating-cnc-machine.webp', en: 'CNC forming of duct sections', ar: 'تشكيل مقاطع المجاري بماكينات CNC' },
+  { src: '/images/gallery/technicians-working-on-duct-sections.webp', en: 'Technicians assembling duct sections', ar: 'فنيون يجمّعون مقاطع المجاري' },
+  { src: '/images/gallery/laser-machine-operator.webp', en: 'Laser cutting machine in operation', ar: 'ماكينة القص بالليزر أثناء التشغيل' },
+  { src: '/images/gallery/engineers-reviewing-drawings.webp', en: 'Engineers reviewing project drawings', ar: 'مهندسون يراجعون رسومات المشروع' },
+];
+
+const sectors = [
+  { en: 'MEP & HVAC Contractors', ar: 'مقاولو الأعمال الكهروميكانيكية والتكييف' },
+  { en: 'Commercial Buildings', ar: 'المباني التجارية' },
+  { en: 'Industrial Facilities', ar: 'المنشآت الصناعية' },
+  { en: 'Construction Projects', ar: 'مشاريع الإنشاءات' },
+  { en: 'Infrastructure', ar: 'البنية التحتية' },
+  { en: 'Facility Management', ar: 'إدارة المرافق' },
+];
+
+const faqs = [
+  {
+    qEn: 'What materials do you use for HVAC ducts?', qAr: 'ما المواد التي تستخدمونها لمجاري التكييف؟',
+    aEn: 'We fabricate in galvanized iron (GI), stainless steel and aluminium, in sheet thicknesses from 0.5 mm to 6 mm, and can advise on the right material for your application.',
+    aAr: 'نصنّع من الحديد المجلفن والستانلس ستيل والألمنيوم بسماكات من 0.5 مم إلى 6 مم، ونقدّم المشورة لاختيار المادة المناسبة لتطبيقك.',
+  },
+  {
+    qEn: 'Do you manufacture everything in-house?', qAr: 'هل تصنّعون كل شيء داخلياً؟',
+    aEn: 'Yes. Drawing review, cutting, forming, assembly, quality control and delivery are all managed by our own team from our facility in M-40, Musaffah.',
+    aAr: 'نعم. مراجعة الرسومات والقص والتشكيل والتجميع وفحص الجودة والتسليم تتم جميعها بواسطة فريقنا من منشأتنا في M-40 مصفح.',
+  },
+  {
+    qEn: 'Which standards do you follow?', qAr: 'ما المعايير التي تتبعونها؟',
+    aEn: 'Our ductwork is built to SMACNA and your project specifications, including gauge selection, reinforcement, sealing and dimensional accuracy. Duct Masters is ISO certified.',
+    aAr: 'نصنّع مجاري الهواء وفق معايير SMACNA ومواصفات مشروعك، بما في ذلك اختيار السماكة والتدعيم والإحكام ودقة الأبعاد. دكت ماسترز حاصلة على شهادة ISO.',
+  },
+  {
+    qEn: 'How quickly will I get a quotation?', qAr: 'متى أحصل على عرض السعر؟',
+    aEn: 'Send your drawings or BOQ and we normally confirm feasibility within one business day, followed by a detailed quotation with production and delivery schedule.',
+    aAr: 'أرسل الرسومات أو جدول الكميات وعادةً نؤكد الجدوى خلال يوم عمل واحد، ثم نرسل عرض سعر مفصلاً مع جدول الإنتاج والتسليم.',
+  },
+  {
+    qEn: 'Do you deliver outside Abu Dhabi?', qAr: 'هل توصلون خارج أبوظبي؟',
+    aEn: 'Yes. We deliver to project sites across Abu Dhabi, Al Ain and the rest of the UAE.',
+    aAr: 'نعم. نوصل إلى مواقع المشاريع في أبوظبي والعين وباقي إمارات الدولة.',
+  },
+];
+
+const pageTitle = 'HVAC Duct Manufacturing Abu Dhabi | Get a Quote';
+const pageDescription = `ISO-certified HVAC duct manufacturer in Musaffah, Abu Dhabi. GI, stainless & aluminium ductwork built in-house to SMACNA. Call ${business.phone}.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.qEn,
+    acceptedAnswer: { '@type': 'Answer', text: f.aEn },
+  })),
+};
+
+const btnPrimary = 'btn-shine inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50';
+const btnWhatsapp = 'inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#25D366]/25 transition-all hover:-translate-y-0.5 hover:bg-[#1ebe5a]';
+const field = 'mt-1 block w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 transition-colors focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/30';
+const label = 'block text-sm font-medium text-stone-700';
+---
+
+<LandingLayout title={pageTitle} description={pageDescription} lpName="hvac-duct-manufacturing" schema={schema}>
+
+  <!-- TOP BAR -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-brand-950/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 lg:px-8">
+      <img src="/images/logo-footer.png" alt="Duct Masters" class="-my-3 h-16 w-auto sm:h-20" width="420" height="272" />
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button type="button" data-lang-toggle class="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-white/10">
+          <span data-toggle-label>العربية</span>
+        </button>
+        <a href={business.phoneHref} data-track="call_click" data-cta-position="header" class="hidden items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20 sm:inline-flex">
+          <Icon name="lucide:phone" class="size-4" />
+          <span dir="ltr">{business.phone}</span>
+        </a>
+        <a href="#quote" class="hidden rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-600 md:inline-flex">
+          <Tx en="Get a Quote" ar="اطلب عرض سعر" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO + FORM -->
+    <section class="relative overflow-hidden bg-brand-950">
+      <div class="absolute inset-0">
+        <img src="/images/gallery/duct-manufacturing-workshop.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" fetchpriority="high" />
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/90 to-brand-950/60 rtl:bg-gradient-to-l"></div>
+        <div class="blueprint-grid absolute inset-0 opacity-40"></div>
+      </div>
+
+      <div class="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 min-[900px]:grid-cols-[1.1fr_1fr] lg:gap-14 lg:px-8 lg:py-20">
+        <div class="self-center">
+          <span class="inline-flex items-center gap-2 rounded-full border border-accent-400/30 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-400">
+            <Icon name="lucide:map-pin" class="size-3.5" />
+            <Tx en={`M-40 Musaffah, Abu Dhabi · Since ${business.yearEstablished}`} ar={`M-40 مصفح، أبوظبي · منذ ${business.yearEstablished}`} />
+          </span>
+          <h1 class="mt-5 font-display text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+            <Tx en="HVAC Duct Manufacturing in Abu Dhabi" ar="تصنيع مجاري التكييف في أبوظبي" />
+          </h1>
+          <Tx tag="p" class="mt-5 max-w-xl text-lg leading-relaxed text-brand-100"
+            en="ISO-certified ductwork made 100% in-house — GI, stainless steel and aluminium ducts and fittings, built to SMACNA and delivered to your site on schedule."
+            ar="مجاري هواء معتمدة بشهادة ISO ومصنّعة داخلياً بالكامل — مجاري وقطع من الحديد المجلفن والستانلس ستيل والألمنيوم، وفق معايير SMACNA وتُسلَّم لموقعك في الموعد." />
+
+          <ul class="mt-7 grid gap-3 sm:grid-cols-2 min-[900px]:max-lg:grid-cols-1">
+            {trust.map((t) => (
+              <li class="flex items-center gap-3 text-sm font-medium text-white">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/20 text-accent-400">
+                  <Icon name={t.icon} class="size-5" />
+                </span>
+                <Tx en={t.en} ar={t.ar} />
+              </li>
+            ))}
+          </ul>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href={business.phoneHref} data-track="call_click" data-cta-position="hero" class={btnPrimary}>
+              <Icon name="lucide:phone" class="size-4" />
+              <Tx en="Call Now" ar="اتصل الآن" />
+            </a>
+            <a href={waEn} data-href-en={waEn} data-href-ar={waAr} target="_blank" rel="noopener" data-track="whatsapp_click" data-cta-position="hero" class={btnWhatsapp}>
+              <Icon name="lucide:message-circle" class="size-4" />
+              <Tx en="WhatsApp Us" ar="راسلنا واتساب" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Quote form -->
+        <div id="quote" class="scroll-mt-24">
+          <div class="rounded-3xl border border-white/10 bg-white p-6 shadow-2xl shadow-black/30 sm:p-8">
+            <Tx tag="h2" class="font-display text-2xl text-brand-900" en="Get Your Free Quote" ar="احصل على عرض سعر مجاني" />
+            <Tx tag="p" class="mt-1.5 text-sm text-stone-500" en="Share your requirements — we reply within one business day." ar="شاركنا متطلباتك — نرد خلال يوم عمل واحد." />
+
+            <form id="lp-quote-form" class="mt-5 space-y-4" action="/api/contact" method="POST" novalidate>
+              <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+              <div>
+                <label for="lp-name" class={label}><Tx en="Full Name *" ar="الاسم الكامل *" /></label>
+                <input id="lp-name" name="name" type="text" maxlength="100" required autocomplete="name" class={field} />
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="lp-phone" class={label}><Tx en="Phone / WhatsApp *" ar="الهاتف / واتساب *" /></label>
+                  <input id="lp-phone" name="phone" type="tel" maxlength="30" required autocomplete="tel" dir="ltr" placeholder="+971 5X XXX XXXX" class={`${field} rtl:text-right`} />
+                </div>
+                <div>
+                  <label for="lp-email" class={label}><Tx en="Email *" ar="البريد الإلكتروني *" /></label>
+                  <input id="lp-email" name="email" type="email" maxlength="254" required autocomplete="email" dir="ltr" placeholder="you@company.com" class={`${field} rtl:text-right`} />
+                </div>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="lp-company" class={label}><Tx en="Company" ar="الشركة" /></label>
+                  <input id="lp-company" name="company" type="text" maxlength="150" autocomplete="organization" class={field} />
+                </div>
+                <div>
+                  <label for="lp-service" class={label}><Tx en="Requirement" ar="المتطلب" /></label>
+                  <select id="lp-service" name="service" class={field}>
+                    <option value="LP HVAC Duct - Rectangular GI ducts" class="bilingual" data-lang-en="Rectangular GI ducts" data-lang-ar="مجاري مستطيلة مجلفنة">Rectangular GI ducts</option>
+                    <option value="LP HVAC Duct - Round / oval ducts" class="bilingual" data-lang-en="Round / oval ducts" data-lang-ar="مجاري دائرية / بيضاوية">Round / oval ducts</option>
+                    <option value="LP HVAC Duct - Stainless / aluminium ducts" class="bilingual" data-lang-en="Stainless / aluminium ducts" data-lang-ar="مجاري ستانلس / ألمنيوم">Stainless / aluminium ducts</option>
+                    <option value="LP HVAC Duct - Fittings & accessories" class="bilingual" data-lang-en="Fittings & accessories" data-lang-ar="القطع والملحقات">Fittings &amp; accessories</option>
+                    <option value="LP HVAC Duct - Complete project supply" class="bilingual" data-lang-en="Complete project supply" data-lang-ar="توريد مشروع كامل">Complete project supply</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="lp-message" class={label}><Tx en="Project Details *" ar="تفاصيل المشروع *" /></label>
+                <textarea id="lp-message" name="message" rows="3" maxlength="5000" required class={field}
+                  placeholder="Project location, quantities, sizes, timeline…"
+                  data-lang-placeholder-en="Project location, quantities, sizes, timeline…"
+                  data-lang-placeholder-ar="موقع المشروع، الكميات، المقاسات، الجدول الزمني…"></textarea>
+              </div>
+
+              <p id="lp-form-status" class="hidden" role="status" aria-live="polite"></p>
+
+              <button type="submit" class={`${btnPrimary} w-full py-4 text-base`}>
+                <Icon name="lucide:send" class="size-4 rtl-flip" />
+                <Tx en="Request My Quote" ar="أرسل طلب عرض السعر" />
+              </button>
+              <p class="flex items-center justify-center gap-1.5 text-xs text-stone-500">
+                <Icon name="lucide:lock" class="size-3.5" />
+                <Tx en="Your details are only used to prepare your quotation." ar="نستخدم بياناتك فقط لإعداد عرض السعر." />
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <section class="border-b border-stone-200 bg-white">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-px bg-stone-200 lg:grid-cols-4">
+        <div class="bg-white px-4 py-6 text-center">
+          <p class="font-display text-3xl text-brand-900">ISO</p>
+          <Tx tag="p" class="mt-1 text-sm text-stone-500" en="Certified Manufacturer" ar="مصنّع معتمد" />
+        </div>
+        <div class="bg-white px-4 py-6 text-center">
+          <p class="font-display text-3xl text-brand-900">100%</p>
+          <Tx tag="p" class="mt-1 text-sm text-stone-500" en="In-House Production" ar="إنتاج داخلي" />
+        </div>
+        <div class="bg-white px-4 py-6 text-center">
+          <p class="font-display text-3xl text-brand-900">{years}+</p>
+          <Tx tag="p" class="mt-1 text-sm text-stone-500" en="Years of Experience" ar="سنوات من الخبرة" />
+        </div>
+        <div class="bg-white px-4 py-6 text-center">
+          <p class="font-display text-3xl text-brand-900">1 <Tx en="Day" ar="يوم" class="text-xl" /></p>
+          <Tx tag="p" class="mt-1 text-sm text-stone-500" en="Quote Response" ar="للرد على طلب السعر" />
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-4 lg:px-8">
+        <div class="max-w-2xl">
+          <Tx tag="p" class="text-sm font-semibold uppercase tracking-wider text-brand-500" en="What We Manufacture" ar="ماذا نصنّع" />
+          <Tx tag="h2" class="mt-2 font-display text-3xl tracking-tight text-brand-900 sm:text-4xl" en="Complete HVAC Ductwork From One Factory" ar="مجاري تكييف متكاملة من مصنع واحد" />
+          <Tx tag="p" class="mt-4 text-stone-600" en="Supply, return, fresh air and exhaust duct systems for commercial, industrial and infrastructure projects — in 0.5 mm to 6 mm sheet." ar="أنظمة مجاري الهواء المزوّد والراجع والنقي والعادم للمشاريع التجارية والصناعية والبنية التحتية — بسماكات من 0.5 مم إلى 6 مم." />
+        </div>
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((p) => (
+            <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+              <span class="flex size-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 ring-1 ring-brand-100">
+                <Icon name={p.icon} class="size-6" />
+              </span>
+              <Tx tag="h3" class="mt-4 text-lg font-semibold text-brand-900" en={p.en} ar={p.ar} />
+              <Tx tag="p" class="mt-2 text-sm leading-relaxed text-stone-600" en={p.dEn} ar={p.dAr} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- IN-HOUSE PROCESS -->
+    <section class="relative overflow-hidden bg-brand-900 py-16 text-white lg:py-24">
+      <div class="blueprint-grid absolute inset-0 opacity-30"></div>
+      <div class="relative mx-auto max-w-7xl px-4 lg:px-8">
+        <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-center">
+          <div>
+            <Tx tag="p" class="text-sm font-semibold uppercase tracking-wider text-accent-400" en="Complete In-House Management" ar="إدارة داخلية متكاملة" />
+            <Tx tag="h2" class="mt-2 font-display text-3xl tracking-tight sm:text-4xl" en="One Team, From Drawing to Delivery" ar="فريق واحد من الرسومات حتى التسليم" />
+            <Tx tag="p" class="mt-4 text-brand-100" en="No subcontracting. Every stage runs under our own roof in Musaffah, so quality, cost and delivery dates stay under control — and you deal with one point of contact." ar="بدون مقاولين من الباطن. كل مرحلة تتم تحت سقف واحد في مصفح، فتبقى الجودة والتكلفة ومواعيد التسليم تحت السيطرة — وتتعامل مع جهة اتصال واحدة." />
+            <div class="mt-6 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-5 py-4">
+              <Icon name="lucide:badge-check" class="size-8 text-accent-400" />
+              <div>
+                <Tx tag="p" class="font-semibold" en="ISO Certified Quality System" ar="نظام جودة معتمد بشهادة ISO" />
+                <Tx tag="p" class="text-sm text-brand-200" en="Documented QC at every stage" ar="رقابة جودة موثقة في كل مرحلة" />
+              </div>
+            </div>
+          </div>
+          <ol class="grid gap-4 sm:grid-cols-2">
+            {steps.map((s, i) => (
+              <li class={`rounded-2xl border border-white/10 bg-white/5 p-5 ${i === steps.length - 1 ? 'sm:col-span-2' : ''}`}>
+                <div class="flex items-center gap-3">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-500 text-sm font-bold">{i + 1}</span>
+                  <Tx tag="h3" class="font-semibold" en={s.en} ar={s.ar} />
+                </div>
+                <Tx tag="p" class="mt-2 text-sm leading-relaxed text-brand-200" en={s.dEn} ar={s.dAr} />
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-4 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div class="max-w-2xl">
+            <Tx tag="p" class="text-sm font-semibold uppercase tracking-wider text-brand-500" en="Our Facility" ar="منشأتنا" />
+            <Tx tag="h2" class="mt-2 font-display text-3xl tracking-tight text-brand-900 sm:text-4xl" en="See Where Your Ducts Are Made" ar="شاهد أين تُصنع مجاريك" />
+          </div>
+          <a href={business.googleMapsUrl} target="_blank" rel="noopener" data-track="location_click" data-cta-position="gallery" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-800">
+            <Icon name="lucide:map-pin" class="size-4" />
+            <Tx en="Visit our factory in M-40" ar="زر مصنعنا في M-40" />
+          </a>
+        </div>
+        <div class="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4">
+          {gallery.map((g) => (
+            <figure class="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-200">
+              <img src={g.src} alt={g.en} loading="lazy" decoding="async" width="1200" height="670" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-950/85 to-transparent p-3 pt-10 text-xs font-medium text-white sm:text-sm">
+                <Tx en={g.en} ar={g.ar} />
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTORS -->
+    <section class="border-y border-stone-200 bg-white py-12">
+      <div class="mx-auto max-w-7xl px-4 lg:px-8">
+        <Tx tag="h2" class="text-center text-sm font-semibold uppercase tracking-wider text-stone-500" en="Trusted by contractors and project teams across the UAE" ar="موثوقون لدى المقاولين وفرق المشاريع في جميع أنحاء الإمارات" />
+        <ul class="mt-6 flex flex-wrap justify-center gap-3">
+          {sectors.map((s) => (
+            <li class="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-medium text-brand-900"><Tx en={s.en} ar={s.ar} /></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-16 lg:py-24">
+      <div class="mx-auto max-w-3xl px-4 lg:px-8">
+        <Tx tag="h2" class="text-center font-display text-3xl tracking-tight text-brand-900 sm:text-4xl" en="Frequently Asked Questions" ar="الأسئلة الشائعة" />
+        <div class="mt-10 space-y-3">
+          {faqs.map((f, i) => (
+            <details class="group rounded-2xl border border-stone-200 bg-white p-5 open:shadow-md" open={i === 0}>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-brand-900">
+                <Tx en={f.qEn} ar={f.qAr} />
+                <Icon name="lucide:chevron-down" class="size-5 shrink-0 text-brand-500 transition-transform group-open:rotate-180" />
+              </summary>
+              <Tx tag="p" class="mt-3 text-sm leading-relaxed text-stone-600" en={f.aEn} ar={f.aAr} />
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION + FINAL CTA -->
+    <section class="bg-brand-950 py-16 text-white lg:py-24">
+      <div class="mx-auto grid max-w-7xl gap-10 px-4 lg:grid-cols-2 lg:items-center lg:px-8">
+        <div>
+          <Tx tag="h2" class="font-display text-3xl tracking-tight sm:text-4xl" en="Ready to Price Your Ductwork?" ar="جاهز لتسعير مجاري الهواء لمشروعك؟" />
+          <Tx tag="p" class="mt-4 text-brand-100" en="Send your drawings or BOQ, call our team, or visit the factory in Musaffah." ar="أرسل الرسومات أو جدول الكميات، أو اتصل بفريقنا، أو زر المصنع في مصفح." />
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#quote" class={btnPrimary}>
+              <Icon name="lucide:file-text" class="size-4" />
+              <Tx en="Get a Quote" ar="اطلب عرض سعر" />
+            </a>
+            <a href={business.phoneHref} data-track="call_click" data-cta-position="footer_cta" class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-white/10">
+              <Icon name="lucide:phone" class="size-4" />
+              <span dir="ltr">{business.phone}</span>
+            </a>
+            <a href={waEn} data-href-en={waEn} data-href-ar={waAr} target="_blank" rel="noopener" data-track="whatsapp_click" data-cta-position="footer_cta" class={btnWhatsapp}>
+              <Icon name="lucide:message-circle" class="size-4" />
+              <Tx en="WhatsApp" ar="واتساب" />
+            </a>
+          </div>
+
+          <dl class="mt-10 space-y-4 text-sm">
+            <div class="flex gap-3">
+              <Icon name="lucide:map-pin" class="mt-0.5 size-5 shrink-0 text-accent-400" />
+              <div>
+                <dt class="font-semibold"><Tx en="Factory" ar="المصنع" /></dt>
+                <dd class="text-brand-200"><Tx en={`${business.address.street}, ${business.address.city}, UAE`} ar="M-40، مصفح، أبوظبي، الإمارات" /></dd>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <Icon name="lucide:clock" class="mt-0.5 size-5 shrink-0 text-accent-400" />
+              <div>
+                <dt class="font-semibold"><Tx en="Working Hours" ar="ساعات العمل" /></dt>
+                <dd class="text-brand-200"><Tx en="Mon – Sat: 8:00 AM – 5:00 PM · Sunday closed" ar="الاثنين – السبت: 8:00 ص – 5:00 م · الأحد مغلق" /></dd>
+              </div>
+            </div>
+          </dl>
+        </div>
+
+        <div class="overflow-hidden rounded-3xl border border-white/10 bg-brand-900">
+          <iframe src={mapEmbed} title="Duct Masters location — M-40 Musaffah, Abu Dhabi" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="h-72 w-full border-0 sm:h-80"></iframe>
+          <a href={business.googleMapsUrl} target="_blank" rel="noopener" data-track="location_click" data-cta-position="map" class="flex items-center justify-center gap-2 bg-white/5 px-4 py-4 text-sm font-semibold transition-colors hover:bg-white/10">
+            <Icon name="lucide:navigation" class="size-4" />
+            <Tx en="Get Directions on Google Maps" ar="احصل على الاتجاهات عبر خرائط جوجل" />
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-brand-950 pb-24 text-center text-xs text-brand-300 md:pb-8">
+    <div class="mx-auto max-w-7xl border-t border-white/10 px-4 pt-6">
+      © {new Date().getFullYear()} {business.legalName}
+    </div>
+  </footer>
+
+  <!-- MOBILE STICKY ACTION BAR -->
+  <nav class="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-stone-200 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] md:hidden" aria-label="Quick contact">
+    <a href={business.phoneHref} data-track="call_click" data-cta-position="sticky_bar" class="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold text-brand-900">
+      <Icon name="lucide:phone" class="size-5 text-brand-500" />
+      <Tx en="Call" ar="اتصال" />
+    </a>
+    <a href={waEn} data-href-en={waEn} data-href-ar={waAr} target="_blank" rel="noopener" data-track="whatsapp_click" data-cta-position="sticky_bar" class="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold text-brand-900">
+      <Icon name="lucide:message-circle" class="size-5 text-[#25D366]" />
+      <Tx en="WhatsApp" ar="واتساب" />
+    </a>
+    <a href={business.googleMapsUrl} target="_blank" rel="noopener" data-track="location_click" data-cta-position="sticky_bar" class="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold text-brand-900">
+      <Icon name="lucide:map-pin" class="size-5 text-brand-500" />
+      <Tx en="Location" ar="الموقع" />
+    </a>
+    <a href="#quote" class="flex flex-col items-center gap-1 bg-gradient-to-br from-accent-500 to-brand-500 py-2.5 text-[11px] font-semibold text-white">
+      <Icon name="lucide:file-text" class="size-5" />
+      <Tx en="Quote" ar="عرض سعر" />
+    </a>
+  </nav>
+
+  <script is:inline>
+    (() => {
+      const form = document.getElementById('lp-quote-form');
+      const statusEl = document.getElementById('lp-form-status');
+      if (!form || !statusEl) return;
+      const ar = () => document.documentElement.lang === 'ar';
+      const msg = {
+        sending: ['Sending…', 'جارٍ الإرسال…'],
+        ok: ['Thank you! Your request has been received — our team will contact you within one business day.', 'شكراً لك! تم استلام طلبك — سيتواصل معك فريقنا خلال يوم عمل واحد.'],
+        missing: ['Please fill in your name, phone, email and project details.', 'يرجى إدخال الاسم والهاتف والبريد الإلكتروني وتفاصيل المشروع.'],
+        email: ['Please enter a valid email address.', 'يرجى إدخال بريد إلكتروني صحيح.'],
+        fail: ['Sorry, something went wrong. Please call or WhatsApp us.', 'عذراً، حدث خطأ. يرجى الاتصال بنا أو مراسلتنا عبر واتساب.'],
+      };
+      const t = (k) => msg[k][ar() ? 1 : 0];
+      const show = (ok, text) => {
+        statusEl.textContent = text;
+        statusEl.className = 'rounded-xl px-4 py-3 text-sm font-medium';
+        statusEl.style.cssText = ok
+          ? 'border:1px solid #bbf7d0;background:#f0fdf4;color:#166534'
+          : 'border:1px solid #fecaca;background:#fef2f2;color:#b91c1c';
+      };
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const val = (k) => String(fd.get(k) || '').trim();
+        if (!val('name') || !val('phone') || !val('email') || !val('message')) return show(false, t('missing'));
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) return show(false, t('email'));
+
+        const btn = form.querySelector('button[type="submit"]');
+        const original = btn.innerHTML;
+        btn.disabled = true; btn.style.opacity = '0.7'; btn.textContent = t('sending');
+        statusEl.className = 'hidden';
+        try {
+          const res = await fetch('/api/contact', { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.ok) {
+            // Conversion — fires only after the server has accepted the enquiry.
+            // user_data feeds Google Ads enhanced conversions (hashed by Google's tag).
+            window.dmTrack('quote_submit', {
+              cta_position: 'quote_form',
+              form_service: val('service'),
+              user_data: { email: val('email'), phone_number: val('phone').replace(/[^\d+]/g, '') },
+            });
+            form.reset();
+            show(true, t('ok'));
+          } else {
+            show(false, ar() ? t('fail') : (data.error || t('fail')));
+          }
+        } catch {
+          show(false, t('fail'));
+        } finally {
+          btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = original;
+        }
+      });
+    })();
+  </script>
+</LandingLayout>

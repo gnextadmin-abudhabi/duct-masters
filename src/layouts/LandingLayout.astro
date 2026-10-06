@@ -1,0 +1,154 @@
+---
+// Layout for paid-traffic landing pages (Google Ads).
+// No site navigation, so visitors stay on the page. Bilingual EN/AR with RTL,
+// and every conversion action is pushed to the GTM dataLayer:
+//   quote_submit · call_click · whatsapp_click · location_click
+// Each event carries cta_position, page_language and lp_name.
+import SEO from '../components/SEO.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Identifies the page in tracking events, e.g. "hvac-duct-manufacturing" */
+  lpName: string;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { title, description, lpName, schema } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-XZYYW5JBG4"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XZYYW5JBG4');
+    </script>
+
+    <!-- Microsoft Clarity -->
+    <script is:inline type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "ytgs344vp6");
+    </script>
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Set language before first paint: ?lang=ar (for Arabic ad groups) wins over the saved choice -->
+    <script is:inline>
+      (() => {
+        let lang = new URLSearchParams(location.search).get('lang');
+        if (lang !== 'ar' && lang !== 'en') {
+          try { lang = localStorage.getItem('ductmasters-lang'); } catch { lang = null; }
+        }
+        if (lang === 'ar') {
+          document.documentElement.lang = 'ar';
+          document.documentElement.dir = 'rtl';
+        }
+      })();
+    </script>
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=DM+Serif+Display&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=DM+Serif+Display&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=DM+Serif+Display&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" /></noscript>
+
+    <link rel="preload" as="image" href="/images/gallery/duct-manufacturing-workshop.webp" fetchpriority="high" />
+
+    <SEO title={title} description={description} schema={schema} noindex />
+
+    <!-- Google Tag Manager -->
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5JPGDSB5');</script>
+    <!-- End Google Tag Manager -->
+  </head>
+
+  <body class="bg-stone-50 text-stone-900 antialiased font-body" data-lp={lpName}>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JPGDSB5" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <slot />
+
+    <style is:global>
+      /* DM Sans / DM Serif have no Arabic glyphs */
+      html[lang='ar'] body,
+      html[lang='ar'] .font-display {
+        font-family: 'IBM Plex Sans Arabic', 'DM Sans', sans-serif;
+        letter-spacing: 0;
+      }
+      html[lang='ar'] .font-display { font-weight: 700; }
+      [dir='rtl'] .rtl-flip { transform: scaleX(-1); }
+    </style>
+
+    <script is:inline>
+      (() => {
+        const html = document.documentElement;
+        const lpName = document.body.dataset.lp || '';
+
+        // ---------- Language ----------
+        const applyLang = (lang, save) => {
+          html.lang = lang;
+          html.dir = lang === 'ar' ? 'rtl' : 'ltr';
+          document.querySelectorAll('.bilingual').forEach((el) => {
+            const text = el.getAttribute('data-lang-' + lang);
+            if (text !== null) el.textContent = text;
+          });
+          document.querySelectorAll('[data-lang-placeholder-en]').forEach((el) => {
+            const ph = el.getAttribute('data-lang-placeholder-' + lang);
+            if (ph !== null) el.setAttribute('placeholder', ph);
+          });
+          document.querySelectorAll('[data-href-en]').forEach((el) => {
+            const href = el.getAttribute('data-href-' + lang);
+            if (href) el.setAttribute('href', href);
+          });
+          document.querySelectorAll('[data-lang-toggle] [data-toggle-label]').forEach((el) => {
+            el.textContent = lang === 'ar' ? 'English' : 'العربية';
+          });
+          if (save) { try { localStorage.setItem('ductmasters-lang', lang); } catch {} }
+        };
+        if (html.lang === 'ar') applyLang('ar', false);
+        document.querySelectorAll('[data-lang-toggle]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const next = html.lang === 'ar' ? 'en' : 'ar';
+            applyLang(next, true);
+            window.dataLayer.push({ event: 'language_switch', page_language: next, lp_name: lpName });
+          });
+        });
+
+        // ---------- Conversion tracking ----------
+        window.dataLayer = window.dataLayer || [];
+        window.dmTrack = (event, params) => {
+          window.dataLayer.push(Object.assign({ event, page_language: html.lang, lp_name: lpName }, params || {}));
+          // Direct GA4 (gtag) event — without user_data: GA4 must not receive email/phone
+          if (typeof window.gtag === 'function') {
+            const { user_data, ...ga4Params } = params || {};
+            window.gtag('event', event, Object.assign({ page_language: html.lang, lp_name: lpName }, ga4Params));
+          }
+          if (typeof window.clarity === 'function') window.clarity('event', event);
+        };
+        // call / whatsapp / location links: <a data-track="call_click" data-cta-position="hero">
+        document.addEventListener('click', (e) => {
+          const el = e.target.closest && e.target.closest('[data-track]');
+          if (!el) return;
+          window.dmTrack(el.getAttribute('data-track'), {
+            cta_position: el.getAttribute('data-cta-position') || '',
+            link_url: el.getAttribute('href') || '',
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
