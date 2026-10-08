@@ -1,0 +1,109 @@
+---
+// Thank-you page for the HVAC duct landing page — visitors land here after the
+// quote form is accepted by /api/contact. The quote_submit conversion fires
+// here (once per submission), so it can't be lost to the redirect.
+import LandingLayout from '../../../layouts/LandingLayout.astro';
+import Tx from '../../../components/lp/Tx.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../../../data/business';
+
+const waNumber = business.whatsapp.replace('https://wa.me/', '');
+const waEn = `https://wa.me/${waNumber}?text=${encodeURIComponent('Hello Duct Masters, I just sent a quote request for HVAC duct manufacturing.')}`;
+const waAr = `https://wa.me/${waNumber}?text=${encodeURIComponent('مرحباً دكت ماسترز، أرسلت للتو طلب عرض سعر لتصنيع مجاري الهواء.')}`;
+
+const next = [
+  { icon: 'lucide:inbox', en: 'We review your request', ar: 'نراجع طلبك', dEn: 'Our estimation team checks your requirements and any drawings or BOQ.', dAr: 'يراجع فريق التسعير متطلباتك وأي رسومات أو جدول كميات.' },
+  { icon: 'lucide:phone-call', en: 'We contact you', ar: 'نتواصل معك', dEn: 'Expect a call or email within one business day to confirm the details.', dAr: 'سنتصل بك أو نراسلك خلال يوم عمل واحد لتأكيد التفاصيل.' },
+  { icon: 'lucide:file-text', en: 'You get your quotation', ar: 'تستلم عرض السعر', dEn: 'A detailed quotation with production and delivery schedule.', dAr: 'عرض سعر مفصّل مع جدول الإنتاج والتسليم.' },
+];
+
+const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10';
+const btnWhatsapp = 'inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#25D366]/20 transition-all hover:-translate-y-0.5 hover:bg-[#1ebe5a]';
+---
+
+<LandingLayout title="Thank You | Duct Masters" description="Your quote request has been received." lpName="hvac-duct-manufacturing">
+
+  <header class="border-b border-white/10 bg-brand-950">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 lg:px-8">
+      <img src="/images/logo-footer.png" alt="Duct Masters" class="-my-2 h-14 w-auto sm:h-16" width="420" height="272" />
+      <button type="button" data-lang-toggle class="rounded-lg px-3 py-2 text-xs font-semibold text-brand-200 transition-colors hover:bg-white/10 hover:text-white">
+        <span data-toggle-label>العربية</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="relative min-h-[calc(100vh-4.5rem)] overflow-hidden bg-brand-950 text-white">
+    <div class="absolute -top-40 start-1/4 h-[32rem] w-[32rem] rounded-full bg-brand-500/25 blur-[140px]"></div>
+
+    <div class="relative mx-auto max-w-3xl px-4 py-16 text-center lg:py-24">
+      <span class="mx-auto flex size-20 items-center justify-center rounded-full bg-emerald-500/15 ring-8 ring-emerald-500/10">
+        <Icon name="lucide:check" class="size-10 text-emerald-400" />
+      </span>
+
+      <Tx tag="h1" class="mt-8 font-display text-4xl tracking-tight sm:text-5xl" en="Thank you — request received!" ar="شكراً لك — تم استلام طلبك!" />
+      <Tx tag="p" class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-brand-100"
+        en="Your quote request has been sent to our team. We'll get back to you within one business day."
+        ar="تم إرسال طلب عرض السعر إلى فريقنا. سنتواصل معك خلال يوم عمل واحد." />
+
+      <ol class="mt-12 grid gap-4 text-start sm:grid-cols-3">
+        {next.map((s, i) => (
+          <li class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div class="flex items-center gap-3">
+              <span class="flex size-10 items-center justify-center rounded-xl bg-brand-900 text-accent-400 ring-1 ring-accent-400/30">
+                <Icon name={s.icon} class="size-5" />
+              </span>
+              <span class="font-mono text-xs font-semibold text-brand-300">0{i + 1}</span>
+            </div>
+            <Tx tag="h2" class="mt-4 font-semibold" en={s.en} ar={s.ar} />
+            <Tx tag="p" class="mt-1.5 text-sm leading-relaxed text-brand-200" en={s.dEn} ar={s.dAr} />
+          </li>
+        ))}
+      </ol>
+
+      <div class="mt-12">
+        <Tx tag="p" class="text-sm font-medium text-brand-200" en="Need it faster? Talk to us now:" ar="تحتاجه بسرعة؟ تحدث معنا الآن:" />
+        <div class="mt-4 flex flex-wrap justify-center gap-3">
+          <a href={business.phoneHref} data-track="call_click" data-cta-position="thank_you" class={btnGhost}>
+            <Icon name="lucide:phone" class="size-4" />
+            <span dir="ltr">{business.phone}</span>
+          </a>
+          <a href={waEn} data-href-en={waEn} data-href-ar={waAr} target="_blank" rel="noopener" data-track="whatsapp_click" data-cta-position="thank_you" class={btnWhatsapp}>
+            <Icon name="lucide:message-circle" class="size-4" />
+            <Tx en="WhatsApp Us" ar="راسلنا واتساب" />
+          </a>
+        </div>
+      </div>
+
+      <a href="/lp/hvac-duct-manufacturing/" class="mt-12 inline-flex items-center gap-2 text-sm font-semibold text-accent-400 hover:text-accent-300">
+        <Icon name="lucide:arrow-left" class="size-4 rtl-flip" />
+        <Tx en="Back to the page" ar="العودة إلى الصفحة" />
+      </a>
+    </div>
+  </main>
+
+  <footer class="bg-brand-950 pb-8 text-center text-xs text-brand-300">
+    <div class="mx-auto max-w-7xl border-t border-white/10 px-4 pt-6">
+      © {new Date().getFullYear()} {business.legalName}
+    </div>
+  </footer>
+
+  <script is:inline>
+    // Fire the conversion once, using the details the form stored before redirecting.
+    // Runs on DOMContentLoaded so LandingLayout has defined window.dmTrack.
+    // A refresh or direct visit finds no stored submission, so nothing is counted twice.
+    window.addEventListener('DOMContentLoaded', () => {
+      let lead = null;
+      try {
+        lead = JSON.parse(sessionStorage.getItem('dm-lead') || 'null');
+        sessionStorage.removeItem('dm-lead');
+      } catch {}
+      if (!lead || typeof window.dmTrack !== 'function') return;
+      window.dmTrack('quote_submit', {
+        cta_position: 'quote_form',
+        form_service: lead.service || '',
+        // user_data feeds Google Ads enhanced conversions (hashed by Google's tag).
+        user_data: { email: lead.email || '', phone_number: lead.phone || '' },
+      });
+    });
+  </script>
+</LandingLayout>
