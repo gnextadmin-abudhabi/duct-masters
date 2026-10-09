@@ -3,6 +3,7 @@
 // No site navigation, so visitors stay on the page. Bilingual EN/AR with RTL,
 // and every conversion action is pushed to the GTM dataLayer:
 //   quote_submit · call_click · whatsapp_click · location_click
+//   (plus quote_cta_click and language_switch for engagement)
 // Each event carries cta_position, page_language and lp_name.
 import SEO from '../components/SEO.astro';
 import '../styles/global.css';
@@ -117,7 +118,7 @@ const { title, description, lpName, schema } = Astro.props;
           btn.addEventListener('click', () => {
             const next = html.lang === 'ar' ? 'en' : 'ar';
             applyLang(next, true);
-            window.dataLayer.push({ event: 'language_switch', page_language: next, lp_name: lpName });
+            window.dmTrack('language_switch', { cta_position: 'header' });
           });
         });
 

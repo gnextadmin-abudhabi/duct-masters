@@ -7,6 +7,7 @@ import LandingLayout from '../../layouts/LandingLayout.astro';
 import Tx from '../../components/lp/Tx.astro';
 import { Icon } from 'astro-icon/components';
 import { business, yearsInBusiness } from '../../data/business';
+import { businessEntity, serviceSchema } from '../../lib/schema';
 
 const years = yearsInBusiness();
 const waNumber = business.whatsapp.replace('https://wa.me/', '');
@@ -120,15 +121,27 @@ const services = [
 const pageTitle = 'HVAC Duct Manufacturing Abu Dhabi | Get a Quote';
 const pageDescription = `ISO-certified HVAC duct manufacturer in Musaffah, Abu Dhabi. GI, stainless & aluminium ductwork built in-house to SMACNA. Call ${business.phone}.`;
 
-const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faqs.map((f) => ({
-    '@type': 'Question',
-    name: f.qEn,
-    acceptedAnswer: { '@type': 'Answer', text: f.aEn },
-  })),
-};
+// Business + Service + FAQ, so the page carries the same entity as the homepage
+const schema = [
+  { '@context': 'https://schema.org', ...businessEntity() },
+  serviceSchema({
+    url: '/lp/hvac-duct-manufacturing/',
+    name: 'HVAC Duct Manufacturing in Abu Dhabi',
+    serviceType: 'HVAC Duct Manufacturing',
+    description: pageDescription,
+    image: '/images/gallery/duct-manufacturing-workshop.webp',
+    areaServed: { '@type': 'AdministrativeArea', name: 'Abu Dhabi' },
+  }),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.qEn,
+      acceptedAnswer: { '@type': 'Answer', text: f.aEn },
+    })),
+  },
+];
 
 const btnPrimary = 'btn-shine inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-6 py-3.5 text-sm font-semibold text-brand-950 shadow-lg shadow-accent-500/25 transition-all hover:-translate-y-0.5 hover:bg-accent-400';
 const btnGhost = 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10';
@@ -153,7 +166,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
           <span dir="ltr" class="hidden sm:inline">{business.phone}</span>
           <Tx en="Call" ar="اتصال" class="sm:hidden" />
         </a>
-        <a href="#quote" class="hidden rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-brand-950 transition-colors hover:bg-accent-400 md:inline-flex">
+        <a href="#quote" data-track="quote_cta_click" data-cta-position="header" class="hidden rounded-lg bg-accent-500 px-4 py-2 text-sm font-semibold text-brand-950 transition-colors hover:bg-accent-400 md:inline-flex">
           <Tx en="Get a Quote" ar="اطلب عرض سعر" />
         </a>
       </div>
@@ -323,7 +336,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
             <span class={`${eyebrow} text-brand-500`}><span class="h-px w-6 bg-brand-500"></span><Tx en="What we manufacture" ar="ماذا نصنّع" /></span>
             <Tx tag="h2" class="mt-3 font-display text-3xl tracking-tight text-brand-900 sm:text-[2.6rem] sm:leading-tight" en="Complete HVAC ductwork from one factory" ar="مجاري تكييف متكاملة من مصنع واحد" />
           </div>
-          <a href="#quote" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-800">
+          <a href="#quote" data-track="quote_cta_click" data-cta-position="services" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-800">
             <Tx en="Price your ductwork" ar="سعّر مجاري مشروعك" />
             <Icon name="lucide:arrow-right" class="size-4 rtl-flip" />
           </a>
@@ -403,7 +416,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
         </ol>
 
         <div class="mt-14 flex flex-wrap justify-center gap-3">
-          <a href="#quote" class={btnPrimary}>
+          <a href="#quote" data-track="quote_cta_click" data-cta-position="process" class={btnPrimary}>
             <Icon name="lucide:file-text" class="size-4" />
             <Tx en="Send Your Drawings / BOQ" ar="أرسل الرسومات / جدول الكميات" />
           </a>
@@ -484,7 +497,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
           <Tx tag="p" class="mt-4 max-w-lg text-lg text-brand-100" en="Send your drawings or BOQ, call our team, or visit the factory in Musaffah." ar="أرسل الرسومات أو جدول الكميات، أو اتصل بفريقنا، أو زر المصنع في مصفح." />
 
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href="#quote" class={btnPrimary}>
+            <a href="#quote" data-track="quote_cta_click" data-cta-position="footer_cta" class={btnPrimary}>
               <Icon name="lucide:file-text" class="size-4" />
               <Tx en="Get a Quote" ar="اطلب عرض سعر" />
             </a>
@@ -543,7 +556,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
       <Icon name="lucide:message-circle" class="size-4" />
       <Tx en="WhatsApp" ar="واتساب" />
     </a>
-    <a href="#quote" class="flex items-center justify-center gap-1.5 rounded-xl bg-brand-900 py-3 text-sm font-semibold text-white">
+    <a href="#quote" data-track="quote_cta_click" data-cta-position="sticky_bar" class="flex items-center justify-center gap-1.5 rounded-xl bg-brand-900 py-3 text-sm font-semibold text-white">
       <Icon name="lucide:file-text" class="size-4" />
       <Tx en="Free Quote" ar="عرض سعر مجاني" />
     </a>
@@ -572,6 +585,15 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
           : 'border:1px solid #fecaca;background:#fef2f2;color:#b91c1c';
       };
 
+      // Enhanced conversions need E.164: 050 123 4567 / 00971… / 971… → +97150…
+      const toE164 = (raw) => {
+        let p = raw.replace(/[^\d+]/g, '').replace(/^00/, '+');
+        if (/^0\d{8,9}$/.test(p)) p = '+971' + p.slice(1);
+        else if (/^971\d{8,9}$/.test(p)) p = '+' + p;
+        else if (/^5\d{8}$/.test(p)) p = '+971' + p;
+        return p;
+      };
+
       // Same request as the /contact/ form: multipart POST to /api/contact, JSON { ok, error } back.
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -594,7 +616,7 @@ const eyebrow = 'inline-flex items-center gap-2 text-xs font-semibold uppercase 
               sessionStorage.setItem('dm-lead', JSON.stringify({
                 service: val('service'),
                 email: val('email'),
-                phone: val('phone').replace(/[^\d+]/g, ''),
+                phone: toE164(val('phone')),
               }));
             } catch {}
             form.reset();
