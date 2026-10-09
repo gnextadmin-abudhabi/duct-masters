@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { blogUrl } from '../../lib/urls';
+import { business } from '../../data/business';
+import { getBusiness } from '../../i18n/localize';
+import { getLang, formatDate, htmlLang } from '../../i18n';
+import { Icon } from 'astro-icon/components';
+import { getPosts, categoryLabel, readingTimeLabel } from './blog';
+
+const lang = getLang(Astro.url);
+const biz = getBusiness(lang);
+
+const posts = (await getPosts(lang)).sort(
+  (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+);
+
+const copy = {
+  en: {
+    title: `Industry Insights & Guides | ${business.name}`,
+    description:
+      'HVAC duct manufacturing and metal fabrication guides for contractors and project managers in Abu Dhabi and the UAE, from Duct Masters.',
+    crumb: 'Blog',
+    heading: 'Industry Insights & Guides',
+    introBefore: 'Technical guides, industry insights, and project advice from the team at',
+    introAfter:
+      'Helping contractors and project managers make informed decisions about HVAC ductwork and metal fabrication.',
+    empty: 'No blog posts yet. Check back soon for industry insights and guides.',
+    blogName: `${business.name} Guides & Insights`,
+  },
+  ar: {
+    title: 'أدلة تصنيع مجاري التكييف والمعادن | دكت ماسترز',
+    description:
+      'أدلة ومقالات حول تصنيع مجاري التكييف وتصنيع المعادن للمقاولين ومديري المشاريع في أبوظبي والإمارات، من دكت ماسترز.',
+    crumb: 'المدونة',
+    heading: 'رؤى وأدلة القطاع',
+    introBefore: 'أدلة فنية ورؤى حول القطاع ونصائح للمشاريع من فريق',
+    introAfter:
+      'نساعد المقاولين ومديري المشاريع على اتخاذ قرارات مدروسة بشأن مجاري هواء التكييف وتصنيع المعادن.',
+    empty: 'لا توجد مقالات بعد. تابعونا قريبًا للاطلاع على رؤى وأدلة القطاع.',
+    blogName: 'أدلة ورؤى دكت ماسترز',
+  },
+}[lang];
+
+const categoryColors: Record<string, { bg: string; text: string }> = {
+  industry: { bg: 'bg-brand-100', text: 'text-brand-700' },
+  guides: { bg: 'bg-accent-100', text: 'text-accent-700' },
+  projects: { bg: 'bg-stone-200', text: 'text-stone-700' },
+  news: { bg: 'bg-stone-100', text: 'text-stone-600' },
+};
+
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  '@id': `${business.website}${blogUrl(undefined, lang)}#blog`,
+  name: copy.blogName,
+  url: `${business.website}${blogUrl(undefined, lang)}`,
+  inLanguage: htmlLang[lang],
+  publisher: { '@id': `${business.website}/#business` },
+  blogPost: posts.map((post) => ({
+    '@type': 'BlogPosting',
+    '@id': `${business.website}${blogUrl(post.id, lang)}#article`,
+    headline: post.data.title,
+    url: `${business.website}${blogUrl(post.id, lang)}`,
+    datePublished: post.data.publishDate,
+  })),
+};
+
+const displayDate = (iso: string) => formatDate(new Date(iso + 'T00:00:00'), lang);
+---
+
+<BaseLayout
+  title={copy.title}
+  description={copy.description}
+  schema={blogSchema}
+  breadcrumbs={[{ label: copy.crumb }]}
+>
+
+  <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">
+    <div class="relative overflow-hidden">
+      <div class="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"></div>
+      <div class="text-center">
+        <h1 data-reveal class="font-display text-4xl font-bold tracking-tight text-brand-900 sm:text-5xl lg:text-6xl">
+          {copy.heading}
+        </h1>
+        <p data-reveal style="--reveal-delay: 120ms" class="mx-auto mt-4 max-w-2xl text-stone-600">
+          {copy.introBefore}
+          {biz.name}. {copy.introAfter}
+        </p>
+      </div>
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="mt-12 text-center text-stone-500">
+        {copy.empty}
+      </p>
+    ) : (
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post, i) => {
+          const colors = categoryColors[post.data.category] || categoryColors.news;
+          return (
+            <a
+              href={blogUrl(post.id, lang)}
+              data-reveal
+              style={`--reveal-delay: ${(i % 3) * 90}ms`}
+              class="group gradient-border flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-brand-900/10"
+            >
+              <div class="flex flex-1 flex-col p-6">
+                <div class="flex items-center gap-3">
+                  <span class={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${colors.bg} ${colors.text}`}>
+                    {categoryLabel(post.data.category, lang)}
+                  </span>
+                  {post.data.readingTime && (
+                    <span class="flex items-center gap-1 text-xs text-stone-400">
+                      <Icon name="lucide:clock" class="size-3" />
+                      {readingTimeLabel(post.data.readingTime, lang)}
+                    </span>
+                  )}
+                </div>
+
+                <h2 class="mt-3 font-display text-lg font-bold tracking-tight text-brand-900 transition-colors group-hover:text-brand-600">
+                  {post.data.title}
+                </h2>
+
+                <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-600">
+                  {post.data.description}
+                </p>
+
+                <div class="mt-4 flex items-center gap-2 border-t border-stone-100 pt-4 text-xs text-stone-400">
+                  <Icon name="lucide:calendar" class="size-3.5" />
+                  <time datetime={post.data.publishDate}>
+                    {displayDate(post.data.publishDate)}
+                  </time>
+                  <span class="text-stone-300">|</span>
+                  <span>{post.data.author}</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
+</BaseLayout>

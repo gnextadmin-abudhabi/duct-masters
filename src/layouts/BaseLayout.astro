@@ -3,6 +3,7 @@ import SEO from '../components/SEO.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getLang, htmlLang, AR_INDEXABLE } from '../i18n';
 import '../styles/global.css';
 
 interface Props {
@@ -17,10 +18,15 @@ interface Props {
 }
 
 const { title, description, canonicalUrl, ogImage, schema, noindex, breadcrumbs } = Astro.props;
+
+// Language comes from the URL: /ar/... is Arabic, everything else English
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
+const arabicFont = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={htmlLang[lang]} dir={isAr ? 'rtl' : 'ltr'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -48,6 +54,14 @@ const { title, description, canonicalUrl, ogImage, schema, noindex, breadcrumbs 
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap" /></noscript>
+    {isAr && (
+      <>
+        <!-- Arabic pages: IBM Plex Sans Arabic (DM fonts have no Arabic glyphs) -->
+        <link rel="preload" as="style" href={arabicFont} />
+        <link rel="stylesheet" href={arabicFont} media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href={arabicFont} /></noscript>
+      </>
+    )}
 
     <!-- Header logo is the LCP element on most pages -->
     <link rel="preload" as="image" href="/images/logo-header.png" fetchpriority="high" />
@@ -59,7 +73,7 @@ const { title, description, canonicalUrl, ogImage, schema, noindex, breadcrumbs 
       canonicalUrl={canonicalUrl}
       ogImage={ogImage}
       schema={schema}
-      noindex={noindex}
+      noindex={noindex || (isAr && !AR_INDEXABLE)}
     />
 
     <!-- Google Tag Manager -->

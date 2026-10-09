@@ -1,7 +1,8 @@
-export const serviceUrl = (serviceSlug: string) => `/services/${serviceSlug}/`;
-export const areaUrl = (areaSlug: string) => `/areas/${areaSlug}/`;
-export const comboUrl = (areaSlug: string, serviceSlug: string) =>
-  `/services/${areaSlug}/${serviceSlug}/`;
-export const contactUrl = () => '/contact/';
-export const aboutUrl = () => '/about/';
-export const blogUrl = (slug?: string) => (slug ? `/blog/${slug}/` : '/blog/');
+import { localizePath, type Lang } from '../i18n';
+
+export const serviceUrl = (serviceSlug: string, lang: Lang = 'en') => localizePath(`/services/${serviceSlug}/`, lang);
+export const areaUrl = (areaSlug: string, lang: Lang = 'en') => localizePath(`/areas/${areaSlug}/`, lang);
+export const contactUrl = (lang: Lang = 'en') => localizePath('/contact/', lang);
+export const aboutUrl = (lang: Lang = 'en') => localizePath('/about/', lang);
+export const blogUrl = (slug?: string, lang: Lang = 'en') =>
+  localizePath(slug ? `/blog/${slug}/` : '/blog/', lang);

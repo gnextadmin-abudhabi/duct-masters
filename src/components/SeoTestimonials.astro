@@ -3,13 +3,17 @@ import type { ServiceArea } from '../data/serviceAreas';
 import type { ServiceType } from '../data/serviceTypes';
 import { getReviewsForPage, reviews } from '../data/seoContent';
 import { Icon } from 'astro-icon/components';
-import { business } from '../data/business';
+import { getLang, formatDate } from '../i18n';
+import { getBusiness } from '../i18n/localize';
 
 interface Props {
   area?: ServiceArea;
   service?: ServiceType;
 }
 
+// Language comes from the URL; review texts are shown as submitted
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
 const { area, service } = Astro.props;
 
 const pageReviews = getReviewsForPage(service?.slug, area?.slug, 3);
@@ -18,10 +22,22 @@ const avgRating = reviews.length > 0
   ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
   : 0;
 
+const copy = isAr
+  ? {
+      heading: 'ماذا يقول عملاؤنا',
+      outOf: (avg: string) => `${avg} من 5`,
+      basedOn: (n: number) => `بناءً على ${n} ${n >= 3 && n <= 10 ? 'تقييمات' : 'تقييماً'}`,
+    }
+  : {
+      heading: 'What Our Clients Say',
+      outOf: (avg: string) => `${avg} out of 5`,
+      basedOn: (n: number) => `based on ${n} reviews`,
+    };
+
 const aggregateSchema = reviews.length > 0 ? {
   '@context': 'https://schema.org',
   '@type': 'HVACBusiness',
-  name: business.name,
+  name: getBusiness(lang).name,
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: avgRating.toFixed(1),
@@ -38,19 +54,12 @@ const aggregateSchema = reviews.length > 0 ? {
   })),
 } : null;
 
-function formatDate(iso: string): string {
-  const date = new Date(iso + 'T00:00:00');
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
+const displayDate = (iso: string) => formatDate(new Date(iso + 'T00:00:00'), lang);
 ---
 
 {pageReviews.length > 0 && (
   <section class="mt-16">
-    <h2 data-reveal class="font-display text-2xl font-bold tracking-tight text-stone-900">What Our Clients Say</h2>
+    <h2 data-reveal class="font-display text-2xl font-bold tracking-tight text-stone-900">{copy.heading}</h2>
 
     <div data-reveal style="--reveal-delay: 80ms" class="mt-4 flex items-center gap-2">
       <div class="flex items-center gap-0.5">
@@ -67,10 +76,10 @@ function formatDate(iso: string): string {
         ))}
       </div>
       <span class="text-sm font-semibold text-stone-800">
-        {avgRating.toFixed(1)} out of 5
+        {copy.outOf(avgRating.toFixed(1))}
       </span>
       <span class="text-sm text-stone-500">
-        based on {reviews.length} reviews
+        {copy.basedOn(reviews.length)}
       </span>
     </div>
 
@@ -83,7 +92,7 @@ function formatDate(iso: string): string {
             style={`--reveal-delay: ${(index % 3) * 90}ms`}
             class="group relative overflow-hidden rounded-3xl border border-stone-200 bg-gradient-to-br from-white to-stone-50 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-900/5"
           >
-            <Icon name="lucide:quote" class="pointer-events-none absolute -top-1 right-4 size-14 text-accent-400/10" />
+            <Icon name="lucide:quote" class="pointer-events-none absolute -top-1 end-4 size-14 text-accent-400/10" />
             <div class="relative flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Icon
@@ -107,7 +116,7 @@ function formatDate(iso: string): string {
                 {review.author}
               </span>
               <span class="block text-xs text-stone-400">
-                {formatDate(review.date)}
+                {displayDate(review.date)}
               </span>
             </div>
           </div>

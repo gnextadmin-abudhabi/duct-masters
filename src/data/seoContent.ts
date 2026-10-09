@@ -2,6 +2,15 @@
 // Duct Masters — SEO Content: FAQs & Reviews
 // ============================================================
 
+import type { Lang } from '../i18n';
+import {
+  quotationFaqAr,
+  licenceFaqAr,
+  materialsFaqAr,
+  serviceFaqsAr,
+  placeFaqsAr,
+} from '../i18n/data/seoContent.ar';
+
 export interface FaqItem {
   question: string;
   answer: string;
@@ -28,19 +37,19 @@ export interface Review {
 
 const MAX_FAQS = 5;
 
-const quotationFaq: FaqItem = {
+const quotationFaqEn: FaqItem = {
   question: 'How do I get a quotation?',
   answer:
     'Send your drawings, specifications, quantities, and material requirements. Call +971 2 564 9566 or email info@ductmasters.ae and we will reply with a detailed quotation.',
 };
 
-const licenceFaq: FaqItem = {
+const licenceFaqEn: FaqItem = {
   question: 'Is Duct Masters a licensed manufacturer?',
   answer:
     'Yes. Duct Masters is registered in the UAE as DUCT MASTERS AIR CONDITIONERS REQUISITES MANUFACTURING - L.L.C and holds a UAE Trade License for air conditioner requisites manufacturing. We operate from our facility in M-40, Musaffah, Abu Dhabi.',
 };
 
-const materialsFaq: FaqItem = {
+const materialsFaqEn: FaqItem = {
   question: 'What materials do you work with?',
   answer:
     'We fabricate with galvanized iron (GI), stainless steel, aluminum, and mild steel in various gauges. We can advise on the best material for HVAC ductwork, industrial applications, or structural components.',
@@ -256,9 +265,13 @@ const placeFaqs = (place: string): FaqItem[] => [
  * @param service  service slug (service hub, Abu Dhabi and combo pages)
  * @param place    location name (Abu Dhabi, combo and area pages)
  */
-export function generateFaqs(service?: string, place?: string): FaqItem[] {
-  const specific = service ? serviceFaqs[service] ?? [] : [];
-  const local = place ? placeFaqs(place) : [];
+export function generateFaqs(service?: string, place?: string, lang: Lang = 'en'): FaqItem[] {
+  const ar = lang === 'ar';
+  const quotationFaq = ar ? quotationFaqAr : quotationFaqEn;
+  const licenceFaq = ar ? licenceFaqAr : licenceFaqEn;
+  const materialsFaq = ar ? materialsFaqAr : materialsFaqEn;
+  const specific = service ? (ar ? serviceFaqsAr : serviceFaqs)[service] ?? [] : [];
+  const local = place ? (ar ? placeFaqsAr : placeFaqs)(place) : [];
 
   let faqs: FaqItem[];
   if (service && place) {

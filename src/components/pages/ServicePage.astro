@@ -1,7 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { business, yearsInBusiness } from '../../data/business';
-import { getServiceBySlug } from '../../data/serviceTypes';
 import { serviceUrl, contactUrl } from '../../lib/urls';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SeoFaq from '../../components/SeoFaq.astro';
@@ -9,6 +8,8 @@ import LocalPageLinks from '../../components/LocalPageLinks.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import { getLocalPagesForService, localTitle, localDescription, localHeading } from '../../data/localPages';
 import { serviceSchema } from '../../lib/schema';
+import { getLang, localizePath, htmlLang } from '../../i18n';
+import { getBusiness, getService } from '../../i18n/localize';
 
 interface Props {
   serviceSlug: string;
@@ -17,46 +18,191 @@ interface Props {
   pageDescription?: string;
 }
 
+// Language comes from the URL (/ar/... = Arabic)
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
+const biz = getBusiness(lang);
+
 const { serviceSlug } = Astro.props;
-const service = getServiceBySlug(serviceSlug);
+const service = getService(serviceSlug, lang);
 const years = yearsInBusiness();
-const pageTitle = Astro.props.pageTitle ?? localTitle(serviceSlug, null);
-const pageDescription = Astro.props.pageDescription ?? localDescription(serviceSlug, null);
-const heading = localHeading(serviceSlug, null);
+const pageTitle = Astro.props.pageTitle ?? localTitle(serviceSlug, null, lang);
+const pageDescription = Astro.props.pageDescription ?? localDescription(serviceSlug, null, lang);
+const heading = localHeading(serviceSlug, null, lang);
 const currentPath = Astro.url.pathname;
 
-const industriesList = [
-  { name: 'HVAC Contractors', icon: 'lucide:air-vent', desc: 'Ductwork and ventilation system fabrication' },
-  { name: 'MEP Contractors', icon: 'lucide:cog', desc: 'Coordinated mechanical & plumbing projects' },
-  { name: 'Construction Companies', icon: 'lucide:building-2', desc: 'Commercial & infrastructure builds' },
-  { name: 'Industrial Facilities', icon: 'lucide:factory', desc: 'Process ventilation & heavy fabrication' },
-  { name: 'Commercial Buildings', icon: 'lucide:building', desc: 'Hotels, offices, hospitals, retail' },
-  { name: 'Infrastructure Projects', icon: 'lucide:landmark', desc: 'Airports, metro, public works' },
-];
+/** "10 أعوام" / "11 عاماً" (Arabic counted-noun agreement) */
+const yearsAr = (n: number) => (n >= 3 && n <= 10 ? `${n} أعوام` : `${n} عاماً`);
+/** "خدمات …" without doubling names that already start with it (e.g. «خدمات القص بالليزر») */
+const svcAr = (s: string) => (s.startsWith('خدمات') ? s : `خدمات ${s}`);
 
-const images = [
-  { src: '/images/gallery/factory-workshop.webp', alt: 'Duct Masters manufacturing facility in Musaffah' },
-  { src: '/images/gallery/laser-machine-operator.webp', alt: 'CNC laser cutting precision fabrication' },
-  { src: '/images/gallery/workers-fabricating-sheet-metal.webp', alt: 'Sheet metal fabrication in progress' },
-  { src: '/images/gallery/technician-inspecting-hvac-duct.webp', alt: 'Quality inspection of HVAC ductwork' },
-];
+const copy = isAr
+  ? {
+      notFoundTitle: 'الصفحة غير موجودة',
+      notFoundDesc: 'تعذّر العثور على الصفحة المطلوبة.',
+      returnHome: 'العودة إلى الرئيسية',
+      services: 'الخدمات',
+      call: 'اتصل على',
+      whatsapp: 'واتساب',
+      quote: 'اطلب عرض سعر',
+      industries: [
+        { name: 'مقاولو التكييف', icon: 'lucide:air-vent', desc: 'تصنيع مجاري الهواء وأنظمة التهوية' },
+        { name: 'مقاولو الأعمال الكهروميكانيكية (MEP)', icon: 'lucide:cog', desc: 'مشاريع ميكانيكية وصحية منسّقة' },
+        { name: 'شركات الإنشاءات', icon: 'lucide:building-2', desc: 'المشاريع التجارية ومشاريع البنية التحتية' },
+        { name: 'المنشآت الصناعية', icon: 'lucide:factory', desc: 'تهوية العمليات والأعمال المعدنية الثقيلة' },
+        { name: 'المباني التجارية', icon: 'lucide:building', desc: 'الفنادق والمكاتب والمستشفيات ومنافذ البيع' },
+        { name: 'مشاريع البنية التحتية', icon: 'lucide:landmark', desc: 'المطارات والمترو والأشغال العامة' },
+      ],
+      images: [
+        { src: '/images/gallery/factory-workshop.webp', alt: 'منشأة التصنيع لدى دكت ماسترز في مصفح' },
+        { src: '/images/gallery/laser-machine-operator.webp', alt: 'تصنيع دقيق بالقص بالليزر CNC' },
+        { src: '/images/gallery/workers-fabricating-sheet-metal.webp', alt: 'أعمال تشكيل الصفائح المعدنية' },
+        { src: '/images/gallery/technician-inspecting-hvac-duct.webp', alt: 'فحص جودة مجاري هواء التكييف' },
+      ],
+      whatHeading: (s: string) => `خبراء ${s} في أبوظبي`,
+      what2: (s: string) =>
+        `بنينا سمعتنا في ${biz.name} على تقديم ${svcAr(s)} بجودة عالية من منشأة التصنيع لدينا في M-40 بمصفح، القلب الصناعي لأبوظبي. وبخبرة تزيد على ${yearsAr(years)} في خدمة المقاولين واستشاريي الأعمال الكهروميكانيكية (MEP) وشركات الإنشاءات والعملاء الصناعيين في جميع أنحاء الإمارات، ندرك المتطلبات الخاصة بكل نوع من المشاريع.`,
+      what3:
+        'يجمع فريقنا بين المهارة الحرفية والماكينات الحديثة بتقنية CNC، ومنها ماكينات القص بالليزر الليفي ومكابس الثني CNC وماكينات قص الصفائح والدرفلة ومحطات اللحام الاحترافية. نعمل بالحديد المجلفن (GI) والستانلس ستيل والألمنيوم والحديد الطري بسماكات من 0.5 مم إلى 6 مم وأكثر، مع التأكد من مطابقة كل قطعة لمعايير SMACNA ومواصفات المشروع.',
+      what4:
+        'وسواء تطلّب مشروعكم قطعة واحدة حسب الطلب، أو دفعة إنتاج، أو عقد توريد متكاملاً لمشروع تجاري كبير، فإن منشأتنا مجهزة لتلبية متطلباتكم بالجودة والدقة والموثوقية التي تتوقعونها.',
+      smacna: 'معايير SMACNA',
+      processBadge: 'منهجية العمل',
+      processHeading: (s: string) => `كيف ننفّذ ${svcAr(s)}`,
+      processText:
+        'يمر كل مشروع بعملية تصنيع منظمة وخاضعة لضبط الجودة لضمان الدقة والاتساق والتسليم في الموعد، من استفساركم الأول وحتى الشحن النهائي.',
+      industriesBadge: 'القطاعات التي نخدمها',
+      whoHeading: (s: string) => `من يحتاج إلى ${svcAr(s)}؟`,
+      whoText: (s: string) =>
+        `تحتاج قطاعات عديدة في الإمارات إلى ${svcAr(s)}، ويتنوع عملاؤنا بين مقاولي التكييف ومقاولي الأعمال الكهروميكانيكية (MEP) الذين يديرون مشاريع تجارية كبرى، ومشغّلي المنشآت الصناعية الذين يحتاجون إلى أنظمة تهوية للعمليات وأعمال معدنية حسب الطلب.`,
+      whyBadge: 'لماذا دكت ماسترز',
+      whyHeading: `لماذا يختار كبار المقاولين ${biz.name}`,
+      whyText: (s: string) =>
+        `تأسست شركتنا عام ${business.yearEstablished}، ونقدّم خبرة تزيد على ${yearsAr(years)} في التصنيع داخل الإمارات، ومنشآت حديثة مجهزة بماكينات CNC، والتزاماً راسخاً بالجودة. إليكم أسباب ثقة مديري المشاريع وفرق المشتريات بنا في متطلبات ${s}.`,
+      why: [
+        { icon: 'lucide:shield-check', title: 'مصنّع مرخّص في الإمارات', desc: 'دكت ماسترز شركة مسجّلة ومرخّصة لتصنيع مستلزمات أجهزة التكييف، وملتزمة بالكامل باللوائح التجارية والصناعية في دولة الإمارات.' },
+        { icon: 'lucide:map-pin', title: 'موقع مركزي في مصفح', desc: `تقع منشأتنا في ${biz.address.street} في قلب المنطقة الصناعية بأبوظبي، ما يقلل مسافات التوصيل وتكاليف النقل لمشاريعكم.` },
+        { icon: 'lucide:cpu', title: 'منشأة مجهزة بماكينات CNC', desc: 'ماكينة قص بالليزر الليفي ومكابس ثني CNC وقص بالبلازما وماكينات قص ودرفلة ومحطات لحام، جميعها تحت سقف واحد لتنفيذ التصنيع من البداية إلى النهاية دون مقاولين من الباطن.' },
+        { icon: 'lucide:users', title: 'فريق تصنيع متمرّس', desc: 'يضم فريقنا لحّامين معتمدين ومشغّلي ماكينات CNC ومفتشي جودة يتمتعون بسنوات من الخبرة العملية في تصنيع مجاري التكييف والأعمال المعدنية.' },
+        { icon: 'lucide:clipboard-check', title: 'ضبط جودة موثّق', desc: 'يخضع كل طلب لفحص الأبعاد والتحقق من الجودة، ونقدّم شهادات المواد وتقارير الفحص ووثائق المشروع حسب الحاجة.' },
+        { icon: 'lucide:truck', title: 'تسليم موثوق للمشاريع', desc: 'نوصل إلى مواقع المشاريع في أبوظبي والعين والمنطقة الغربية وجميع أنحاء الإمارات، ونخطط عمليات النقل وفق الجدول الزمني لمشروعكم.' },
+        { icon: 'lucide:file-text', title: 'الرسومات التنفيذية والهندسة', desc: 'يمكن لفريقنا إعداد الرسومات التنفيذية للتصنيع انطلاقاً من التصميم المبدئي، أو العمل مباشرة من رسوماتكم المعتمدة، حسب ما يتطلبه مشروعكم.' },
+        { icon: 'lucide:badge-check', title: 'معايير SMACNA ومواصفات المشروع', desc: 'تُصنَّع مجاري الهواء وفق معايير SMACNA، ونلتزم بمواصفات كل مشروع ومتطلبات المواد ومعايير الجودة الخاصة به.' },
+      ],
+      facilityHeading: 'منشأتنا وقدراتنا',
+      facilityText: 'ألقِ نظرة داخل منشأة التصنيع لدينا في مصفح، حيث تجتمع الدقة والجودة والموثوقية.',
+      relatedHeading: 'خدمات تصنيع مكمّلة',
+      relatedText: (s: string) =>
+        `${s} جزء من مجموعة متكاملة من خدمات تصنيع المعادن لدينا. تعرّف على الخدمات ذات الصلة المتوفرة من منشأتنا نفسها في مصفح.`,
+      nearYou: (s: string) => `${s} بالقرب منك`,
+      nearYouIntro: (s: string) =>
+        `نقدّم ${svcAr(s)} من منشأتنا في M-40 بمصفح للمشاريع في جميع أنحاء أبوظبي. اطّلع على التفاصيل الخاصة بمنطقتك:`,
+      ctaHeading: (s: string) => `احصل على عرض سعر تنافسي: ${s}`,
+      ctaText:
+        'أرسلوا إلينا الرسومات والمواصفات والكميات، وسيقدّم فريقنا عرض سعر مفصّلاً يتضمن تفاصيل الأسعار والجدول الزمني للإنتاج وموعد التسليم، عادةً خلال يوم عمل واحد.',
+      visit: 'أو تفضلوا بزيارة منشأتنا:',
+      addressSep: '، ',
+    }
+  : {
+      notFoundTitle: 'Page Not Found',
+      notFoundDesc: 'The requested page could not be found.',
+      returnHome: 'Return Home',
+      services: 'Services',
+      call: 'Call',
+      whatsapp: 'WhatsApp',
+      quote: 'Request a Quote',
+      industries: [
+        { name: 'HVAC Contractors', icon: 'lucide:air-vent', desc: 'Ductwork and ventilation system fabrication' },
+        { name: 'MEP Contractors', icon: 'lucide:cog', desc: 'Coordinated mechanical & plumbing projects' },
+        { name: 'Construction Companies', icon: 'lucide:building-2', desc: 'Commercial & infrastructure builds' },
+        { name: 'Industrial Facilities', icon: 'lucide:factory', desc: 'Process ventilation & heavy fabrication' },
+        { name: 'Commercial Buildings', icon: 'lucide:building', desc: 'Hotels, offices, hospitals, retail' },
+        { name: 'Infrastructure Projects', icon: 'lucide:landmark', desc: 'Airports, metro, public works' },
+      ],
+      images: [
+        { src: '/images/gallery/factory-workshop.webp', alt: 'Duct Masters manufacturing facility in Musaffah' },
+        { src: '/images/gallery/laser-machine-operator.webp', alt: 'CNC laser cutting precision fabrication' },
+        { src: '/images/gallery/workers-fabricating-sheet-metal.webp', alt: 'Sheet metal fabrication in progress' },
+        { src: '/images/gallery/technician-inspecting-hvac-duct.webp', alt: 'Quality inspection of HVAC ductwork' },
+      ],
+      whatHeading: (s: string) => `Expert ${s} in Abu Dhabi`,
+      what2: (s: string) =>
+        `At ${biz.name}, we have built our reputation on delivering high-quality ${s.toLowerCase()} from our manufacturing facility in M-40, Musaffah — the industrial heart of Abu Dhabi. With ${years}+ years of experience serving contractors, MEP consultants, construction firms, and industrial clients across the UAE, we understand the specific requirements of every project type.`,
+      what3:
+        'Our team combines skilled craftsmanship with modern CNC machinery — including fiber laser cutters, CNC press brakes, shearing machines, rolling equipment, and professional welding stations. We work with galvanized iron (GI), stainless steel, aluminum, and mild steel in gauges from 0.5mm to 6mm and beyond, ensuring every component meets SMACNA standards and project specifications.',
+      what4: '',
+      smacna: 'SMACNA Standards',
+      processBadge: 'Our Process',
+      processHeading: (s: string) => `How We Deliver ${s}`,
+      processText: '',
+      industriesBadge: 'Industries Served',
+      whoHeading: (s: string) => `Who Needs ${s}?`,
+      whoText: (s: string) =>
+        `${s} is a critical requirement across multiple sectors in the UAE. Our clients range from HVAC and MEP contractors managing large-scale commercial projects to industrial facility operators requiring process ventilation and custom metal fabrications.`,
+      whyBadge: 'Why Duct Masters',
+      whyHeading: `Why Leading Contractors Choose ${biz.name}`,
+      whyText: (s: string) =>
+        `Established in ${business.yearEstablished}, we bring ${years}+ years of UAE manufacturing experience, modern CNC-equipped facilities, and an unwavering commitment to quality — here is why project managers and procurement teams trust us with their ${s.toLowerCase()} requirements.`,
+      why: [
+        { icon: 'lucide:shield-check', title: 'UAE Trade Licensed Manufacturer', desc: `${business.legalName} — legally registered and licensed for air conditioner requisites manufacturing. Full compliance with UAE commercial and industrial regulations.` },
+        { icon: 'lucide:map-pin', title: 'Central Musaffah Location', desc: `Our facility at ${business.address.street} places us at the center of Abu Dhabi's industrial zone — minimizing delivery distances and logistics costs for your projects.` },
+        { icon: 'lucide:cpu', title: 'CNC-Equipped Facility', desc: 'Fiber laser cutter, CNC press brakes, plasma cutting, shearing, rolling, and welding stations — all under one roof for end-to-end fabrication without subcontracting.' },
+        { icon: 'lucide:users', title: 'Experienced Fabrication Team', desc: `Our workforce includes certified welders, CNC operators, and quality inspectors with years of hands-on experience in HVAC duct fabrication and metal works.` },
+        { icon: 'lucide:clipboard-check', title: 'Documented Quality Control', desc: 'Every order undergoes dimensional inspection and QC verification. We provide material certificates, inspection reports, and project documentation as required.' },
+        { icon: 'lucide:truck', title: 'Reliable Project Delivery', desc: 'We deliver to project sites across Abu Dhabi, Al Ain, the Western Region, and throughout the UAE. Our logistics are planned around your project schedule.' },
+        { icon: 'lucide:file-text', title: 'Shop Drawings & Engineering', desc: 'Our team can prepare fabrication shop drawings from your design intent, or work directly from your approved drawings — whichever your project requires.' },
+        { icon: 'lucide:badge-check', title: 'SMACNA & Project Standards', desc: 'Ductwork fabricated to SMACNA standards. We adapt to project-specific specifications, material requirements, and quality benchmarks.' },
+      ],
+      facilityHeading: 'Our Facility & Capabilities',
+      facilityText: 'Take a look inside our Musaffah manufacturing facility — where precision, quality, and reliability come together.',
+      relatedHeading: 'Complementary Fabrication Services',
+      relatedText: (s: string) =>
+        `Our ${s.toLowerCase()} is part of a complete range of metal fabrication services — explore related capabilities available from the same Musaffah facility.`,
+      nearYou: (s: string) => `${s} Near You`,
+      nearYouIntro: (s: string) =>
+        `We deliver ${s.toLowerCase()} from our M-40 Musaffah facility to projects across Abu Dhabi. See details for your area:`,
+      ctaHeading: (s: string) => `Get a Competitive Quotation for ${s}`,
+      ctaText:
+        'Send us your drawings, specifications, and quantities. Our team will provide a detailed quotation with pricing breakdown, production timeline, and delivery schedule — typically within one business day.',
+      visit: 'Or visit our facility:',
+      addressSep: ', ',
+    };
+
+// English sentences that interpolate the (lower-cased) service name
+const what4 = service
+  ? isAr
+    ? copy.what4
+    : `Whether your project requires a single custom part, a batch production run, or a full-scale supply contract for a large commercial development, our facility is equipped to handle your ${service.name.toLowerCase()} requirements with the quality, precision, and reliability you expect.`
+  : '';
+const processText = service
+  ? isAr
+    ? copy.processText
+    : `Every ${service.name.toLowerCase()} project follows a structured, quality-controlled manufacturing process to ensure accuracy, consistency, and on-time delivery — from your initial inquiry to the final dispatch.`
+  : '';
+
+const industriesList = copy.industries;
+const images = copy.images;
 
 if (!service) Astro.response.status = 404;
 
 const schema = service
-  ? serviceSchema({
-      url: currentPath,
-      name: heading,
-      serviceType: service.name,
-      description: pageDescription,
-      image: service.image,
-      areaServed: { '@type': 'AdministrativeArea', name: 'Abu Dhabi' },
-    })
+  ? {
+      ...serviceSchema({
+        url: currentPath,
+        name: heading,
+        serviceType: service.name,
+        description: pageDescription,
+        image: service.image,
+        areaServed: { '@type': 'AdministrativeArea', name: isAr ? 'أبوظبي' : 'Abu Dhabi' },
+      }),
+      ...(isAr ? { inLanguage: htmlLang[lang] } : {}),
+    }
   : undefined;
 
+// Crumb hrefs are English paths; Breadcrumbs localizes them
 const breadcrumbs = service
   ? [
-      { label: 'Services', href: '/services/' },
+      { label: copy.services, href: '/services/' },
       { label: service.name, href: serviceUrl(service.slug) },
       { label: heading },
     ]
@@ -64,10 +210,10 @@ const breadcrumbs = service
 ---
 
 {!service ? (
-  <BaseLayout title="Page Not Found" description="The requested page could not be found.">
+  <BaseLayout title={copy.notFoundTitle} description={copy.notFoundDesc}>
     <div class="mx-auto max-w-3xl px-5 py-24 text-center">
-      <h1 class="font-display text-4xl font-bold tracking-tight text-brand-900">Page Not Found</h1>
-      <a href="/" class="btn-shine mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30">Return Home</a>
+      <h1 class="font-display text-4xl font-bold tracking-tight text-brand-900">{copy.notFoundTitle}</h1>
+      <a href={localizePath('/', lang)} class="btn-shine mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30">{copy.returnHome}</a>
     </div>
   </BaseLayout>
 ) : (
@@ -77,9 +223,9 @@ const breadcrumbs = service
     <section class="relative overflow-hidden bg-brand-950">
       <div class="absolute inset-0">
         <img src={images[0].src} alt="" class="h-full w-full object-cover opacity-20" width="1200" height="670" loading="eager" />
-        <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-950/85 to-brand-950/50"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-950/85 to-brand-950/50 rtl:bg-gradient-to-bl"></div>
         <div class="blueprint-grid-dark absolute inset-0 opacity-60"></div>
-        <div class="absolute -top-24 right-0 h-96 w-96 rounded-full bg-accent-500/15 blur-[120px] animate-glow"></div>
+        <div class="absolute -top-24 end-0 h-96 w-96 rounded-full bg-accent-500/15 blur-[120px] animate-glow"></div>
       </div>
       <div class="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div data-reveal class="inline-flex items-center gap-2.5 rounded-full border border-accent-400/20 bg-white/5 px-4 py-1.5 text-accent-400 backdrop-blur-sm">
@@ -90,13 +236,13 @@ const breadcrumbs = service
         <p data-reveal style="--reveal-delay: 160ms" class="mt-6 max-w-3xl text-lg leading-relaxed text-brand-200">{service.description}</p>
         <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
-            <Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />Call {business.phone}
+            <Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />{`${copy.call} `}<span dir="ltr">{business.phone}</span>
           </a>
           <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3.5 text-sm font-semibold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-green-600">
-            <Icon name="lucide:message-circle" class="size-4" />WhatsApp
+            <Icon name="lucide:message-circle" class="size-4" />{copy.whatsapp}
           </a>
-          <a href={contactUrl()} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
-            <Icon name="lucide:file-text" class="size-4" />Request a Quote
+          <a href={contactUrl(lang)} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
+            <Icon name="lucide:file-text" class="size-4" />{copy.quote}
           </a>
         </div>
       </div>
@@ -107,17 +253,17 @@ const breadcrumbs = service
       <div class="mx-auto max-w-7xl px-5 lg:px-8">
         <div class="grid items-center gap-12 lg:grid-cols-5 lg:gap-16">
           <div data-reveal="left" class="lg:col-span-3">
-            <h2 class="font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">Expert {service.name} in Abu Dhabi</h2>
+            <h2 class="font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{copy.whatHeading(service.name)}</h2>
             <div class="mt-6 space-y-4 leading-relaxed text-stone-600">
               <p>{service.description}</p>
-              <p>At {business.name}, we have built our reputation on delivering high-quality {service.name.toLowerCase()} from our manufacturing facility in M-40, Musaffah — the industrial heart of Abu Dhabi. With {years}+ years of experience serving contractors, MEP consultants, construction firms, and industrial clients across the UAE, we understand the specific requirements of every project type.</p>
-              <p>Our team combines skilled craftsmanship with modern CNC machinery — including fiber laser cutters, CNC press brakes, shearing machines, rolling equipment, and professional welding stations. We work with galvanized iron (GI), stainless steel, aluminum, and mild steel in gauges from 0.5mm to 6mm and beyond, ensuring every component meets SMACNA standards and project specifications.</p>
-              <p>Whether your project requires a single custom part, a batch production run, or a full-scale supply contract for a large commercial development, our facility is equipped to handle your {service.name.toLowerCase()} requirements with the quality, precision, and reliability you expect.</p>
+              <p>{copy.what2(service.name)}</p>
+              <p>{copy.what3}</p>
+              <p>{what4}</p>
             </div>
             <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-stone-100 pt-6 text-sm font-medium text-stone-600">
-              <span class="flex items-center gap-2"><Icon name="lucide:shield-check" class="size-4 text-brand-600" />{business.license}</span>
-              <span class="flex items-center gap-2"><Icon name="lucide:map-pin" class="size-4 text-brand-600" />{business.address.street}</span>
-              <span class="flex items-center gap-2"><Icon name="lucide:ruler" class="size-4 text-brand-600" />SMACNA Standards</span>
+              <span class="flex items-center gap-2"><Icon name="lucide:shield-check" class="size-4 text-brand-600" />{biz.license}</span>
+              <span class="flex items-center gap-2"><Icon name="lucide:map-pin" class="size-4 text-brand-600" />{biz.address.street}</span>
+              <span class="flex items-center gap-2"><Icon name="lucide:ruler" class="size-4 text-brand-600" />{copy.smacna}</span>
             </div>
           </div>
           <div data-reveal="right" class="lg:col-span-2">
@@ -137,10 +283,10 @@ const breadcrumbs = service
       <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
           <span data-reveal class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-700 shadow-sm">
-            <Icon name="lucide:list-checks" class="size-3.5" /><span class="bilingual" data-lang-en="Our Process" data-lang-ar="منهجية العمل">Our Process</span>
+            <Icon name="lucide:list-checks" class="size-3.5" /><span>{copy.processBadge}</span>
           </span>
-          <h2 data-reveal style="--reveal-delay: 80ms" class="mt-5 font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">How We Deliver {service.name}</h2>
-          <p data-reveal style="--reveal-delay: 140ms" class="mx-auto mt-4 max-w-2xl text-stone-600">Every {service.name.toLowerCase()} project follows a structured, quality-controlled manufacturing process to ensure accuracy, consistency, and on-time delivery — from your initial inquiry to the final dispatch.</p>
+          <h2 data-reveal style="--reveal-delay: 80ms" class="mt-5 font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{copy.processHeading(service.name)}</h2>
+          <p data-reveal style="--reveal-delay: 140ms" class="mx-auto mt-4 max-w-2xl text-stone-600">{processText}</p>
         </div>
         <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {service.process.map((step, index) => (
@@ -157,15 +303,15 @@ const breadcrumbs = service
     {/* ===== WHO NEEDS THIS + IMAGE ===== */}
     <section class="relative overflow-hidden bg-brand-950 py-20 lg:py-28">
       <div class="blueprint-grid-dark absolute inset-0"></div>
-      <div class="absolute -bottom-24 left-0 h-96 w-96 rounded-full bg-brand-500/15 blur-[120px]"></div>
+      <div class="absolute -bottom-24 start-0 h-96 w-96 rounded-full bg-brand-500/15 blur-[120px]"></div>
       <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div class="grid items-center gap-12 lg:grid-cols-5 lg:gap-16">
           <div data-reveal="left" class="lg:col-span-3">
             <span class="inline-flex items-center gap-2 rounded-full border border-accent-400/20 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-400">
-              <Icon name="lucide:building-2" class="size-3.5" /><span class="bilingual" data-lang-en="Industries Served" data-lang-ar="القطاعات التي نخدمها">Industries Served</span>
+              <Icon name="lucide:building-2" class="size-3.5" /><span>{copy.industriesBadge}</span>
             </span>
-            <h2 class="mt-5 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Who Needs {service.name}?</h2>
-            <p class="mt-4 text-brand-300">{service.name} is a critical requirement across multiple sectors in the UAE. Our clients range from HVAC and MEP contractors managing large-scale commercial projects to industrial facility operators requiring process ventilation and custom metal fabrications.</p>
+            <h2 class="mt-5 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">{copy.whoHeading(service.name)}</h2>
+            <p class="mt-4 text-brand-300">{copy.whoText(service.name)}</p>
             <div class="mt-8 grid gap-3 sm:grid-cols-2">
               {industriesList.map((ind, i) => (
                 <div data-reveal style={`--reveal-delay: ${i * 70}ms`} class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm transition-colors hover:border-accent-400/30 hover:bg-white/[0.06]">
@@ -195,22 +341,13 @@ const breadcrumbs = service
       <div class="mx-auto max-w-7xl px-5 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
           <span data-reveal class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-700">
-            <Icon name="lucide:award" class="size-3.5" /><span class="bilingual" data-lang-en="Why Duct Masters" data-lang-ar="لماذا دكت ماسترز">Why Duct Masters</span>
+            <Icon name="lucide:award" class="size-3.5" /><span>{copy.whyBadge}</span>
           </span>
-          <h2 data-reveal style="--reveal-delay: 80ms" class="mt-5 font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">Why Leading Contractors Choose {business.name}</h2>
-          <p data-reveal style="--reveal-delay: 140ms" class="mx-auto mt-4 max-w-2xl text-stone-600">Established in {business.yearEstablished}, we bring {years}+ years of UAE manufacturing experience, modern CNC-equipped facilities, and an unwavering commitment to quality — here is why project managers and procurement teams trust us with their {service.name.toLowerCase()} requirements.</p>
+          <h2 data-reveal style="--reveal-delay: 80ms" class="mt-5 font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{copy.whyHeading}</h2>
+          <p data-reveal style="--reveal-delay: 140ms" class="mx-auto mt-4 max-w-2xl text-stone-600">{copy.whyText(service.name)}</p>
         </div>
         <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: 'lucide:shield-check', title: 'UAE Trade Licensed Manufacturer', desc: `${business.legalName} — legally registered and licensed for air conditioner requisites manufacturing. Full compliance with UAE commercial and industrial regulations.` },
-            { icon: 'lucide:map-pin', title: 'Central Musaffah Location', desc: `Our facility at ${business.address.street} places us at the center of Abu Dhabi's industrial zone — minimizing delivery distances and logistics costs for your projects.` },
-            { icon: 'lucide:cpu', title: 'CNC-Equipped Facility', desc: 'Fiber laser cutter, CNC press brakes, plasma cutting, shearing, rolling, and welding stations — all under one roof for end-to-end fabrication without subcontracting.' },
-            { icon: 'lucide:users', title: 'Experienced Fabrication Team', desc: `Our workforce includes certified welders, CNC operators, and quality inspectors with years of hands-on experience in HVAC duct fabrication and metal works.` },
-            { icon: 'lucide:clipboard-check', title: 'Documented Quality Control', desc: 'Every order undergoes dimensional inspection and QC verification. We provide material certificates, inspection reports, and project documentation as required.' },
-            { icon: 'lucide:truck', title: 'Reliable Project Delivery', desc: 'We deliver to project sites across Abu Dhabi, Al Ain, the Western Region, and throughout the UAE. Our logistics are planned around your project schedule.' },
-            { icon: 'lucide:file-text', title: 'Shop Drawings & Engineering', desc: 'Our team can prepare fabrication shop drawings from your design intent, or work directly from your approved drawings — whichever your project requires.' },
-            { icon: 'lucide:badge-check', title: 'SMACNA & Project Standards', desc: 'Ductwork fabricated to SMACNA standards. We adapt to project-specific specifications, material requirements, and quality benchmarks.' },
-          ].map((item, i) => (
+          {copy.why.map((item, i) => (
             <div data-reveal style={`--reveal-delay: ${(i % 4) * 80}ms`} class="group gradient-border rounded-3xl border border-stone-200 bg-stone-50 p-6 transition-all duration-500 hover:-translate-y-1.5 hover:bg-white hover:shadow-xl hover:shadow-brand-900/10">
               <div class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500/15 to-brand-500/10 ring-1 ring-brand-100 transition-transform group-hover:scale-110"><Icon name={item.icon} class="size-6 text-brand-600" /></div>
               <h3 class="mt-4 font-semibold text-brand-900">{item.title}</h3>
@@ -224,16 +361,16 @@ const breadcrumbs = service
     {/* ===== FACILITY IMAGE STRIP ===== */}
     <section class="overflow-hidden bg-stone-50 py-20 lg:py-28">
       <div class="mx-auto max-w-7xl px-5 lg:px-8">
-        <h2 data-reveal class="text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">Our Facility &amp; Capabilities</h2>
-        <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-center text-stone-600">Take a look inside our Musaffah manufacturing facility — where precision, quality, and reliability come together.</p>
+        <h2 data-reveal class="text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{copy.facilityHeading}</h2>
+        <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-center text-stone-600">{copy.facilityText}</p>
       </div>
       <div data-reveal class="mt-12 flex gap-5 overflow-x-auto px-5 pb-6 lg:px-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div class="mx-auto flex max-w-7xl gap-5">
-          {images.slice(0, 4).map((img, i) => (
+          {images.slice(0, 4).map((img) => (
             <div class="group relative w-64 shrink-0 overflow-hidden rounded-3xl shadow-lg ring-1 ring-stone-900/5 sm:w-72 lg:w-80">
               <img src={img.src} alt={img.alt} class="h-48 w-full object-cover transition-transform duration-700 group-hover:scale-110 sm:h-56" width="1200" height="670" loading="lazy" />
               <div class="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100">
-                <p class="absolute bottom-4 left-4 right-4 text-xs text-white/90">{img.alt}</p>
+                <p class="absolute bottom-4 start-4 end-4 text-xs text-white/90">{img.alt}</p>
               </div>
             </div>
           ))}
@@ -245,14 +382,14 @@ const breadcrumbs = service
     {service.relatedServices.length > 0 && (
       <section class="bg-white py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-5 lg:px-8">
-          <h2 data-reveal class="bilingual text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl" data-lang-en="Complementary Fabrication Services" data-lang-ar="خدمات التشكيل المكملة">Complementary Fabrication Services</h2>
-          <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-center text-stone-600">Our {service.name.toLowerCase()} is part of a complete range of metal fabrication services — explore related capabilities available from the same Musaffah facility.</p>
+          <h2 data-reveal class="text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{copy.relatedHeading}</h2>
+          <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-center text-stone-600">{copy.relatedText(service.name)}</p>
           <div data-reveal class="mt-10 flex flex-wrap justify-center gap-3">
             {service.relatedServices.map((relatedSlug) => {
-              const related = getServiceBySlug(relatedSlug);
+              const related = getService(relatedSlug, lang);
               if (!related) return null;
               return (
-                <a href={serviceUrl(related.slug)} class="group inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-medium text-stone-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow">
+                <a href={serviceUrl(related.slug, lang)} class="group inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-5 py-2.5 text-sm font-medium text-stone-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow">
                   <Icon name={related.icon} class="size-4 text-brand-500" />{related.name}
                 </a>
               );
@@ -265,8 +402,8 @@ const breadcrumbs = service
     <LocalPageLinks
       pages={getLocalPagesForService(service.slug)}
       currentPath={currentPath}
-      heading={`${service.name} Near You`}
-      intro={`We deliver ${service.name.toLowerCase()} from our M-40 Musaffah facility to projects across Abu Dhabi. See details for your area:`}
+      heading={copy.nearYou(service.name)}
+      intro={copy.nearYouIntro(service.name)}
     />
 
     <RelatedPosts serviceSlug={service.slug} />
@@ -285,20 +422,20 @@ const breadcrumbs = service
         <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>
       </div>
       <div class="relative mx-auto max-w-4xl px-5 py-24 text-center lg:px-8">
-        <h2 data-reveal class="bilingual font-display text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl" data-lang-en="Get a Competitive Quotation for {service.name}" data-lang-ar="احصل على عرض سعر تنافسي لـ {service.name}">Get a Competitive Quotation for {service.name}</h2>
-        <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-5 max-w-2xl text-lg text-brand-200">Send us your drawings, specifications, and quantities. Our team will provide a detailed quotation with pricing breakdown, production timeline, and delivery schedule — typically within one business day.</p>
+        <h2 data-reveal class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">{copy.ctaHeading(service.name)}</h2>
+        <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-5 max-w-2xl text-lg text-brand-200">{copy.ctaText}</p>
         <div data-reveal style="--reveal-delay: 160ms" class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
-            <Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" />{business.phone}
+            <Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" /><span dir="ltr">{business.phone}</span>
           </a>
           <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600">
-            <Icon name="lucide:message-circle" class="size-5" />WhatsApp
+            <Icon name="lucide:message-circle" class="size-5" />{copy.whatsapp}
           </a>
           <a href={`mailto:${business.email}`} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
-            <Icon name="lucide:mail" class="size-5" />{business.email}
+            <Icon name="lucide:mail" class="size-5" /><span dir="ltr">{business.email}</span>
           </a>
         </div>
-        <p class="mt-6 text-xs text-brand-300">Or visit our facility: {business.address.street}, {business.address.city}, {business.address.country}</p>
+        <p class="mt-6 text-xs text-brand-300">{`${copy.visit} ${[biz.address.street, biz.address.city, biz.address.country].join(copy.addressSep)}`}</p>
       </div>
     </section>
   </BaseLayout>

@@ -1,8 +1,10 @@
 ---
 import { Icon } from 'astro-icon/components';
-import type { ServiceArea } from '../data/serviceAreas';
+import { serviceAreas, type ServiceArea } from '../data/serviceAreas';
 import type { ServiceType } from '../data/serviceTypes';
 import { generateFaqs } from '../data/seoContent';
+import { getLang, htmlLang } from '../i18n';
+import { getArea, getService } from '../i18n/localize';
 
 interface Props {
   /** Area page object, or a plain place name such as "Abu Dhabi" */
@@ -10,15 +12,38 @@ interface Props {
   service?: ServiceType;
 }
 
+// Language comes from the URL; callers pass English or localized data
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
 const { area, service } = Astro.props;
-const place = typeof area === 'string' ? area : area?.name;
 
-const faqs = generateFaqs(service?.slug, place);
+/** Place name in the page language (accepts an area object, an English name, or an already-Arabic name) */
+function placeFor(a: ServiceArea | string | undefined): string | undefined {
+  if (!a) return undefined;
+  if (!isAr) return typeof a === 'string' ? a : a.name;
+  if (typeof a !== 'string') return getArea(a.slug, 'ar')?.name ?? a.name;
+  if (a === 'Abu Dhabi') return 'أبوظبي';
+  const match = serviceAreas.find((s) => s.name === a);
+  return match ? getArea(match.slug, 'ar')?.name ?? a : a;
+}
 
-const heading = service && place
-  ? `${service.name} in ${place}: FAQs`
-  : service
-  ? `Frequently Asked Questions about ${service.name}`
+const place = placeFor(area);
+const serviceName = service ? (isAr ? getService(service.slug, 'ar')?.name ?? service.name : service.name) : undefined;
+
+const faqs = generateFaqs(service?.slug, place, lang);
+
+const heading = isAr
+  ? serviceName && place
+    ? `${serviceName} في ${place}: الأسئلة الشائعة`
+    : serviceName
+    ? `الأسئلة الشائعة حول ${serviceName}`
+    : place
+    ? `خدمات التصنيع في ${place}: الأسئلة الشائعة`
+    : 'الأسئلة الشائعة'
+  : serviceName && place
+  ? `${serviceName} in ${place}: FAQs`
+  : serviceName
+  ? `Frequently Asked Questions about ${serviceName}`
   : place
   ? `Fabrication Services in ${place}: FAQs`
   : 'Frequently Asked Questions';
@@ -26,6 +51,7 @@ const heading = service && place
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
+  ...(isAr ? { inLanguage: htmlLang[lang] } : {}),
   mainEntity: faqs.map((faq) => ({
     '@type': 'Question',
     name: faq.question,

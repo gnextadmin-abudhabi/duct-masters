@@ -1,0 +1,251 @@
+---
+// Area page (/areas/<slug>/ and /ar/areas/<slug>/)
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness } from '../../data/business';
+import { getNearbyAreas } from '../../data/serviceAreas';
+import { serviceUrl, areaUrl, contactUrl } from '../../lib/urls';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeoFaq from '../SeoFaq.astro';
+import SeoTestimonials from '../SeoTestimonials.astro';
+import { getLocalPage } from '../../data/localPages';
+import { serviceSchema } from '../../lib/schema';
+import { getLang, htmlLang, localizePath } from '../../i18n';
+import { getArea, getServices, getBusiness, localizeArea } from '../../i18n/localize';
+
+interface Props {
+  areaSlug: string;
+}
+
+const { areaSlug } = Astro.props;
+const lang = getLang(Astro.url);
+const area = getArea(areaSlug, lang);
+if (!area) throw new Error(`Unknown area "${areaSlug}"`);
+const b = getBusiness(lang);
+const years = yearsInBusiness();
+const nearbyAreas = getNearbyAreas(area.slug).map((a) => localizeArea(a, lang));
+const services = getServices(lang);
+
+/** Arabic counted noun: 1 موقع واحد, 2 موقعان, 3–10 مواقع, 11+ موقعاً */
+const arLocations = (n: number) =>
+  n === 1 ? 'موقع واحد' : n === 2 ? 'موقعان' : n <= 10 ? `${n} مواقع` : `${n} موقعاً`;
+
+const copy = {
+  en: {
+    titles: [
+      `Metal Fabrication in ${area.name} | ${b.name}`,
+      `Metal Fabrication in ${area.name}`,
+      `Fabrication Services ${area.name}`,
+    ],
+    descriptions: [
+      `HVAC ductwork and sheet metal fabrication for projects in ${area.name}, made at our M-40 Musaffah factory. Call ${business.phone}.`,
+      `HVAC ductwork and sheet metal fabrication for projects in ${area.name}, made at our M-40 Musaffah factory.`,
+    ],
+    descriptionFallback: `Ductwork and metal fabrication for ${area.name}.`,
+    schemaName: `HVAC Duct Manufacturing & Metal Fabrication in ${area.name}`,
+    schemaType: 'HVAC duct manufacturing and sheet metal fabrication',
+    crumb: 'Areas',
+    region: `${area.county}, Abu Dhabi`,
+    h1: `Duct & Metal Fabrication Services in ${area.name}`,
+    call: 'Call',
+    whatsapp: 'WhatsApp',
+    quote: 'Request a Quote',
+    servingHeading: `Serving ${area.name} Since ${business.yearEstablished}`,
+    p2: `Duct Masters has been a trusted provider of HVAC duct manufacturing and sheet metal fabrication to businesses and projects in ${area.name} for over ${years} years. Based in M-40, Musaffah, our facility is strategically located to serve ${area.name} and the surrounding industrial areas with reliable manufacturing, competitive pricing, and on-time delivery.`,
+    p3: `We provide a complete range of fabrication services to ${area.name}: HVAC duct manufacturing, sheet metal fabrication, laser cutting, CNC forming, industrial welding, metal rolling and punching, custom fabrication, powder coating, duct system design, and duct supply. Whether your project requires standard ductwork or complex custom fabrications, our CNC-equipped facility and experienced team deliver consistent quality.`,
+    p4: `Our clients in ${area.name} include HVAC contractors, MEP consultants, construction companies, industrial facility operators, and infrastructure project teams. We understand the specific requirements of industrial and commercial clients and provide the documentation, quality control, and project support that professional projects demand.`,
+    musaffah: 'Musaffah',
+    imageAlt: 'Precision fabrication at Duct Masters',
+    quickFacts: 'Quick Facts',
+    regionLabel: 'Region',
+    nearbyLabel: 'Nearby Zones',
+    nearbyCount: `${nearbyAreas.length} locations`,
+    facility: 'Facility',
+    servicesHeading: `Fabrication Services Available in ${area.name}`,
+    servicesIntro: `Duct Masters provides the full range of metal fabrication services to ${area.name}. Select a service for details specific to this location.`,
+    nearbyHeading: 'Nearby Industrial Zones',
+    ctaHeading: `Need Fabrication Services in ${area.name}?`,
+    ctaText: `${b.name} is a UAE-licensed HVAC duct manufacturer and sheet metal fabricator serving ${area.name} and ${area.county}. Contact us for a competitive project quotation.`,
+  },
+  ar: {
+    titles: [
+      `تصنيع مجاري التكييف والمعادن في ${area.name} | ${b.name}`,
+      `تصنيع مجاري التكييف في ${area.name} | ${b.name}`,
+      `تصنيع مجاري التكييف والمعادن في ${area.name}`,
+    ],
+    descriptions: [
+      `تصنيع مجاري التكييف وتشكيل الصفائح المعدنية لمشاريع ${area.name} في مصنعنا بمنطقة M-40 مصفح. اتصل على ${business.phone}.`,
+      `تصنيع مجاري التكييف وتشكيل الصفائح المعدنية لمشاريع ${area.name} في مصنعنا بمنطقة M-40 مصفح.`,
+    ],
+    descriptionFallback: `تصنيع مجاري الهواء والأعمال المعدنية في ${area.name}.`,
+    schemaName: `تصنيع مجاري التكييف والأعمال المعدنية في ${area.name}`,
+    schemaType: 'تصنيع مجاري التكييف وتشكيل الصفائح المعدنية',
+    crumb: 'المناطق',
+    region: `${area.county}، إمارة أبوظبي`,
+    h1: `خدمات تصنيع مجاري الهواء والمعادن في ${area.name}`,
+    call: 'اتصل',
+    whatsapp: 'واتساب',
+    quote: 'اطلب عرض سعر',
+    servingHeading: `نخدم ${area.name} منذ عام ${business.yearEstablished}`,
+    p2: `تُعد دكت ماسترز مزوّداً موثوقاً لخدمات تصنيع مجاري التكييف وتشكيل الصفائح المعدنية للشركات والمشاريع في ${area.name} منذ أكثر من ${years} عاماً. وتقع منشأتنا في M-40 بمصفح في موقع استراتيجي يتيح لنا خدمة ${area.name} والمناطق الصناعية المحيطة بتصنيع موثوق وأسعار تنافسية وتسليم في الموعد المحدد.`,
+    p3: `نقدّم مجموعة متكاملة من خدمات التصنيع في ${area.name}: تصنيع مجاري التكييف، وتشكيل الصفائح المعدنية، والقص بالليزر، وتشكيل المعادن بماكينات CNC، واللحام الصناعي، والدرفلة والتخريم، والتصنيع حسب الطلب، والطلاء بالبودرة، وتصميم أنظمة مجاري الهواء، وتوريد مجاري الهواء. وسواء احتاج مشروعك إلى مجاري هواء قياسية أو أعمال تصنيع معقّدة حسب الطلب، تضمن منشأتنا المجهّزة بماكينات CNC وفريقنا المتمرّس جودة ثابتة.`,
+    p4: `يشمل عملاؤنا في ${area.name} مقاولي التكييف واستشاريي الأعمال الكهروميكانيكية (MEP) وشركات الإنشاءات ومشغّلي المنشآت الصناعية وفرق مشاريع البنية التحتية. نفهم المتطلبات الخاصة للعملاء الصناعيين والتجاريين، ونوفّر الوثائق وضبط الجودة ودعم المشاريع الذي تتطلبه المشاريع الاحترافية.`,
+    musaffah: 'مصفح',
+    imageAlt: 'تصنيع دقيق في دكت ماسترز',
+    quickFacts: 'معلومات سريعة',
+    regionLabel: 'المنطقة',
+    nearbyLabel: 'المناطق القريبة',
+    nearbyCount: arLocations(nearbyAreas.length),
+    facility: 'المنشأة',
+    servicesHeading: `خدمات التصنيع المتوفرة في ${area.name}`,
+    servicesIntro: `تقدّم دكت ماسترز مجموعة متكاملة من خدمات تصنيع المعادن في ${area.name}. اختر خدمة للاطلاع على التفاصيل الخاصة بهذا الموقع.`,
+    nearbyHeading: 'المناطق الصناعية القريبة',
+    ctaHeading: `هل تحتاج إلى خدمات تصنيع في ${area.name}؟`,
+    ctaText: `${b.name} شركة مرخّصة في الإمارات لتصنيع مجاري التكييف وتشكيل الصفائح المعدنية، وتخدم ${area.name} و${area.county}. تواصل معنا للحصول على عرض سعر تنافسي لمشروعك.`,
+  },
+}[lang];
+
+const pageTitle = copy.titles.find((t) => t.length <= 60) ?? area.name;
+const metaDescription = copy.descriptions.find((d) => d.length <= 150) ?? copy.descriptionFallback;
+
+// Services link to the local landing page for this area when one exists
+const serviceLink = (slug: string) => {
+  const local = getLocalPage(slug, area.slug)?.path;
+  return local ? localizePath(local, lang) : serviceUrl(slug, lang);
+};
+
+const schema = {
+  ...serviceSchema({
+    url: areaUrl(area.slug, lang),
+    name: copy.schemaName,
+    serviceType: copy.schemaType,
+    description: metaDescription,
+    areaServed: {
+      '@type': 'Place',
+      name: area.name,
+      containedInPlace: { '@type': 'AdministrativeArea', name: area.county },
+    },
+  }),
+  inLanguage: htmlLang[lang],
+};
+
+const breadcrumbs = [
+  { label: copy.crumb, href: '/areas/' },
+  { label: area.name },
+];
+---
+
+<BaseLayout title={pageTitle} description={metaDescription} schema={schema} breadcrumbs={breadcrumbs}>
+
+  {/* HERO */}
+  <section class="relative -mt-24 flex min-h-[58vh] items-center overflow-hidden bg-brand-950 pt-32 pb-20 lg:-mt-[108px] lg:min-h-[62vh] lg:pt-40 lg:pb-24">
+    <div class="absolute inset-0">
+      <img src="/images/gallery/factory-workshop.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
+      <div class="absolute inset-0 bg-gradient-to-br from-brand-950/95 via-brand-950/88 to-brand-950/70 rtl:bg-gradient-to-bl"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_18%_45%,_rgba(46,104,156,0.24),_transparent_70%)] rtl:bg-[radial-gradient(ellipse_55%_60%_at_82%_45%,_rgba(46,104,156,0.24),_transparent_70%)]"></div>
+      <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
+    </div>
+    <div class="relative mx-auto w-full max-w-7xl px-5 lg:px-8">
+      <span data-reveal class="inline-flex items-center gap-2 rounded-full border border-accent-400/20 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-400 backdrop-blur-sm">
+        <Icon name="lucide:map-pin" class="size-3.5" />{copy.region}
+      </span>
+      <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">{copy.h1}</h1>
+      <p data-reveal style="--reveal-delay: 160ms" class="mt-5 max-w-2xl text-lg leading-relaxed text-brand-100">{area.description}</p>
+      <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
+        <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"><Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />{copy.call} <span dir="ltr">{business.phone}</span></a>
+        <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600"><Icon name="lucide:message-circle" class="size-4" />{copy.whatsapp}</a>
+        <a href={contactUrl(lang)} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"><Icon name="lucide:file-text" class="size-4" />{copy.quote}</a>
+      </div>
+    </div>
+  </section>
+
+  {/* CONTENT */}
+  <section class="relative overflow-hidden bg-gradient-to-b from-white via-stone-50 to-white py-20 lg:py-28">
+    <div class="dot-grid pointer-events-none absolute inset-0 opacity-30"></div>
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="animate-aurora-a absolute -start-32 top-0 h-[28rem] w-[28rem] rounded-full bg-accent-400/10 blur-[130px]"></div>
+      <div class="animate-aurora-b absolute -bottom-24 end-0 h-[26rem] w-[26rem] rounded-full bg-brand-400/10 blur-[130px]"></div>
+    </div>
+    <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid items-start gap-8 lg:grid-cols-5 lg:gap-10">
+        <div data-reveal="left" class="lg:col-span-3">
+          <div class="rounded-3xl border border-white/60 bg-white/80 p-8 shadow-xl shadow-brand-900/5 backdrop-blur-md lg:p-10">
+            <h2 class="font-display text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">{copy.servingHeading}</h2>
+            <div class="mt-6 space-y-4 leading-relaxed text-stone-600">
+              <p>{area.description}</p>
+              <p>{copy.p2}</p>
+              <p>{copy.p3}</p>
+              <p>{copy.p4}</p>
+            </div>
+            <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-stone-200 pt-6 text-sm font-medium text-stone-600">
+              <span class="flex items-center gap-2"><Icon name="lucide:map-pin" class="size-4 text-brand-600" />{area.name}</span>
+              <span class="flex items-center gap-2"><Icon name="lucide:shield-check" class="size-4 text-brand-600" />{b.license}</span>
+              <span class="flex items-center gap-2"><Icon name="lucide:factory" class="size-4 text-brand-600" /><span dir="ltr">M-40</span>{lang === 'ar' ? '، ' : ', '}{copy.musaffah}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-2 space-y-6">
+          <div data-reveal="right" class="relative overflow-hidden rounded-3xl shadow-2xl shadow-brand-900/20 ring-1 ring-stone-900/5 animate-float-slow"><img src="/images/gallery/laser-machine-operator.webp" alt={copy.imageAlt} class="aspect-[4/3] w-full object-cover" width="1200" height="670" loading="lazy" /><div class="absolute inset-0 bg-gradient-to-t from-brand-950/30 to-transparent"></div></div>
+          <div data-reveal="right" style="--reveal-delay: 120ms" class="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg shadow-brand-900/5 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500/15 to-brand-500/10 ring-1 ring-brand-100"><Icon name="lucide:clipboard-list" class="size-5 text-brand-600" /></div>
+              <h3 class="font-display text-lg font-bold tracking-tight text-brand-900">{copy.quickFacts}</h3>
+            </div>
+            <dl class="mt-4 space-y-2.5 text-sm">
+              <div class="flex justify-between border-b border-stone-100 pb-2.5"><dt class="text-stone-500">{copy.regionLabel}</dt><dd class="font-medium text-stone-800">{area.county}</dd></div>
+              <div class="flex justify-between border-b border-stone-100 pb-2.5"><dt class="text-stone-500">{copy.nearbyLabel}</dt><dd class="font-medium text-stone-800">{copy.nearbyCount}</dd></div>
+              <div class="flex justify-between"><dt class="text-stone-500">{copy.facility}</dt><dd class="font-medium text-stone-800">{b.address.street}</dd></div>
+            </dl>
+            <a href={business.phoneHref} class="btn-shine group mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"><Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" /><span dir="ltr">{business.phone}</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* SERVICES AVAILABLE */}
+  <section class="border-t border-stone-200/60 bg-gradient-to-b from-stone-50 to-white py-20 lg:py-28">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 data-reveal class="text-center font-display text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">{copy.servicesHeading}</h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-3 max-w-2xl text-center text-stone-600">{copy.servicesIntro}</p>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {services.map((service, i) => (
+          <a href={serviceLink(service.slug)} data-reveal data-spotlight style={`--reveal-delay: ${(i % 4) * 80}ms`} class="group spotlight-card gradient-border rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-900/5">
+            <div class="flex items-center gap-3"><span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:ring-brand-500"><Icon name={service.icon} class="size-4 text-brand-600 transition-colors group-hover:text-white" /></span><h3 class="text-sm font-semibold text-stone-800 group-hover:text-brand-800">{service.shortName}</h3></div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* NEARBY AREAS */}
+  {nearbyAreas.length > 0 && (
+    <section class="bg-stone-50 py-20 lg:py-28">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <h2 data-reveal class="text-center font-display text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">{copy.nearbyHeading}</h2>
+        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {nearbyAreas.map((n, i) => <a href={areaUrl(n.slug, lang)} data-reveal data-spotlight style={`--reveal-delay: ${(i % 4) * 80}ms`} class="group spotlight-card gradient-border flex items-center gap-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-900/5"><span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:ring-brand-500"><Icon name="lucide:map-pin" class="size-4 text-brand-600 transition-colors group-hover:text-white" /></span><span><span class="block font-semibold text-stone-800 group-hover:text-brand-800">{n.name}</span><span class="mt-0.5 block text-xs text-stone-500">{n.county}</span></span></a>)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <div class="border-t border-stone-200/60 bg-white"><SeoFaq area={area} /></div>
+  <div class="mx-auto max-w-7xl px-5 lg:px-8"><SeoTestimonials area={area} /></div>
+
+  {/* CTA */}
+  <section class="relative overflow-hidden bg-brand-950 py-20">
+    <div class="absolute inset-0"><img src="/images/gallery/workers-fabricating-sheet-metal.webp" alt="" class="h-full w-full object-cover opacity-20" width="1200" height="670" loading="lazy" /></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/85 to-brand-950/70"></div>
+    <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
+    <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>
+    <div class="relative mx-auto max-w-4xl px-5 text-center lg:px-8">
+      <h2 data-reveal class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">{copy.ctaHeading}</h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-lg text-brand-200">{copy.ctaText}</p>
+      <div data-reveal style="--reveal-delay: 160ms" class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"><Icon name="lucide:phone" class="size-5" /><span dir="ltr">{business.phone}</span></a>
+        <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600"><Icon name="lucide:message-circle" class="size-5" />{copy.whatsapp}</a>
+        <a href={`mailto:${business.email}`} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"><Icon name="lucide:mail" class="size-5" /><span dir="ltr">{business.email}</span></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

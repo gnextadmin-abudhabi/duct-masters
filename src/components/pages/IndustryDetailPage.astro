@@ -1,0 +1,202 @@
+---
+// Industry page (/industries/<slug>/ and /ar/industries/<slug>/)
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../../data/business';
+import { serviceUrl, contactUrl } from '../../lib/urls';
+import { getLocalPage } from '../../data/localPages';
+import { businessRef } from '../../lib/schema';
+import { getLang, htmlLang, localizePath } from '../../i18n';
+import { getService, getBusiness } from '../../i18n/localize';
+import { getIndustry, forIndustry, industryAudience } from '../../i18n/industries';
+
+interface Props {
+  industrySlug: string;
+}
+
+const { industrySlug } = Astro.props;
+const lang = getLang(Astro.url);
+const data = getIndustry(industrySlug, lang);
+if (!data) throw new Error(`Unknown industry "${industrySlug}"`);
+const b = getBusiness(lang);
+const forName = forIndustry(data, lang); // "for hvac contractors" / «لمقاولي التكييف»
+
+const copy = {
+  en: {
+    titles: [
+      `Ductwork & Fabrication for ${data.name} | ${b.name}`,
+      `Ductwork for ${data.name} | ${b.name}`,
+      `Ductwork for ${data.name}`,
+    ],
+    descriptions: [
+      `HVAC ductwork and metal fabrication for ${data.name} in Abu Dhabi and the UAE, made at our M-40 Musaffah factory.`,
+      `HVAC ductwork and metal fabrication for ${data.name} across Abu Dhabi and the UAE.`,
+    ],
+    schemaName: `HVAC Duct Manufacturing & Metal Fabrication for ${data.name}`,
+    schemaType: 'HVAC duct manufacturing and sheet metal fabrication',
+    country: 'United Arab Emirates',
+    crumb: 'Industries',
+    h1: `HVAC Ductwork & Fabrication for ${data.name}`,
+    servingHeading: `Serving ${data.name} Across Abu Dhabi`,
+    p3: `Based in M-40, Musaffah, ${b.name} has been serving contractors, developers, and project owners across Abu Dhabi since ${business.yearEstablished}. Contact us to discuss how we can support your next ${data.name.toLowerCase()} project.`,
+    relevant: 'Relevant Services',
+    quoteHeading: 'Get a Quote',
+    quoteText: 'Send us your project details for a competitive quotation.',
+    workWith: 'Work With Duct Masters',
+    workText: `We provide HVAC duct manufacturing, sheet metal fabrication, and custom metal works ${forName} across Abu Dhabi and the UAE.`,
+    whatsapp: 'WhatsApp',
+    quote: 'Request a Quote',
+  },
+  ar: {
+    titles: [
+      `مجاري التكييف والأعمال المعدنية ${forName} | ${b.name}`,
+      `مجاري التكييف ${forName} | ${b.name}`,
+      `مجاري التكييف ${forName}`,
+    ],
+    descriptions: [
+      `تصنيع مجاري التكييف والأعمال المعدنية ${forName} في أبوظبي والإمارات، في مصنعنا بمنطقة M-40 مصفح.`,
+      `تصنيع مجاري التكييف والأعمال المعدنية ${forName} في أبوظبي والإمارات.`,
+    ],
+    schemaName: `تصنيع مجاري التكييف والأعمال المعدنية ${forName}`,
+    schemaType: 'تصنيع مجاري التكييف وتشكيل الصفائح المعدنية',
+    country: 'الإمارات العربية المتحدة',
+    crumb: 'القطاعات',
+    h1: `مجاري التكييف والأعمال المعدنية ${forName}`,
+    servingHeading: `نخدم ${industryAudience(data, lang)} في جميع أنحاء أبوظبي`,
+    p3: `تخدم ${b.name}، ومقرها M-40 في مصفح، المقاولين والمطوّرين وأصحاب المشاريع في جميع أنحاء أبوظبي منذ عام ${business.yearEstablished}. تواصل معنا لنناقش كيف يمكننا دعم مشروعك القادم.`,
+    relevant: 'الخدمات ذات الصلة',
+    quoteHeading: 'اطلب عرض سعر',
+    quoteText: 'أرسل لنا تفاصيل مشروعك للحصول على عرض سعر تنافسي.',
+    workWith: 'تعاون مع دكت ماسترز',
+    workText: `نقدّم تصنيع مجاري التكييف وتشكيل الصفائح المعدنية والأعمال المعدنية حسب الطلب ${forName} في أبوظبي وجميع أنحاء الإمارات.`,
+    whatsapp: 'واتساب',
+    quote: 'اطلب عرض سعر',
+  },
+}[lang];
+
+const pageTitle = copy.titles.find((t) => t.length <= 60) ?? data.name;
+const pageDescription = copy.descriptions.find((d) => d.length <= 150) ?? data.description;
+
+// Link services to their Abu Dhabi landing page when one exists
+const serviceLink = (slug: string) => {
+  const local = getLocalPage(slug, null)?.path;
+  return local ? localizePath(local, lang) : serviceUrl(slug, lang);
+};
+
+const pageUrl = new URL(localizePath(`/industries/${data.slug}/`, lang), business.website).href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${pageUrl}#service`,
+  name: copy.schemaName,
+  serviceType: copy.schemaType,
+  description: data.description,
+  url: pageUrl,
+  inLanguage: htmlLang[lang],
+  audience: { '@type': 'BusinessAudience', audienceType: data.name },
+  provider: businessRef(),
+  areaServed: { '@type': 'Country', name: copy.country },
+};
+
+const breadcrumbs = [{ label: copy.crumb, href: '/industries/' }, { label: data.name }];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  schema={schema}
+  breadcrumbs={breadcrumbs}
+>
+
+  <section class="relative -mt-28 flex min-h-[58vh] items-center overflow-hidden bg-brand-950 pt-32 pb-20 lg:-mt-[140px] lg:min-h-[60vh] lg:pt-40 lg:pb-24">
+    <div class="absolute inset-0">
+      <img src="/images/gallery/factory-uniforms.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
+      <div class="absolute inset-0 bg-gradient-to-br from-brand-950/95 via-brand-950/88 to-brand-950/70 rtl:bg-gradient-to-bl"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_18%_45%,_rgba(46,104,156,0.24),_transparent_70%)] rtl:bg-[radial-gradient(ellipse_55%_60%_at_82%_45%,_rgba(46,104,156,0.24),_transparent_70%)]"></div>
+      <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
+    </div>
+    <div class="relative mx-auto w-full max-w-7xl px-5 lg:px-8">
+      <span data-reveal class="inline-flex size-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm">
+        <Icon name="lucide:building-2" class="size-7" />
+      </span>
+      <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">{copy.h1}</h1>
+      <p data-reveal style="--reveal-delay: 160ms" class="mt-5 max-w-2xl text-lg leading-relaxed text-brand-100">{data.description}</p>
+    </div>
+  </section>
+
+  <section class="gradient-animated relative overflow-hidden py-20 lg:py-28">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="animate-aurora-a absolute -start-24 top-0 h-[30rem] w-[30rem] rounded-full bg-accent-400/25 blur-[120px]"></div>
+      <div class="animate-aurora-b absolute -bottom-20 end-0 h-[28rem] w-[28rem] rounded-full bg-brand-400/20 blur-[120px]"></div>
+    </div>
+    <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid gap-8 lg:grid-cols-3 lg:gap-10">
+        <div data-reveal="left" class="lg:col-span-2">
+          <div class="rounded-3xl border border-white/60 bg-white/80 p-8 shadow-xl shadow-brand-900/5 backdrop-blur-md lg:p-10">
+            <div class="prose-editorial max-w-none">
+              <h2>{copy.servingHeading}</h2>
+              <p>{data.description}</p>
+              <p>{data.whyDuctMasters}</p>
+              <p>{copy.p3}</p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="space-y-6">
+          <div data-reveal="right" class="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-lg shadow-brand-900/5 backdrop-blur-md">
+            <h3 class="font-display text-lg font-bold tracking-tight text-brand-900">{copy.relevant}</h3>
+            <ul class="mt-4 space-y-1">
+              {data.services.map((slug) => {
+                const svc = getService(slug, lang);
+                if (!svc) return null;
+                return (
+                  <li>
+                    <a href={serviceLink(svc.slug)} class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-brand-50 hover:text-brand-700">
+                      <span class="flex size-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:text-white group-hover:ring-brand-500">
+                        <Icon name="lucide:arrow-right" class="size-3.5 transition-transform rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+                      </span>
+                      {svc.name}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div data-reveal="right" style="--reveal-delay: 120ms" class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-800 to-brand-950 p-6 text-center ring-1 ring-white/10">
+            <div class="blueprint-grid-dark absolute inset-0 opacity-50"></div>
+            <div class="absolute -top-16 -end-10 h-40 w-40 rounded-full bg-accent-500/20 blur-[70px] animate-glow"></div>
+            <div class="relative">
+              <h3 class="font-display text-lg font-bold tracking-tight text-white">{copy.quoteHeading}</h3>
+              <p class="mt-2 text-sm text-brand-200">{copy.quoteText}</p>
+              <a href={business.phoneHref} class="btn-shine group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
+                <Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" /><span dir="ltr">{business.phone}</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-brand-950 py-16">
+    <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/85 to-brand-950/70"></div>
+    <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>
+    <div class="relative mx-auto max-w-4xl px-5 text-center lg:px-8">
+      <h2 data-reveal class="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">{copy.workWith}</h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-brand-200">{copy.workText}</p>
+      <div data-reveal style="--reveal-delay: 160ms" class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
+          <Icon name="lucide:phone" class="size-4" /><span dir="ltr">{business.phone}</span>
+        </a>
+        <a href={business.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-green-600">
+          <Icon name="lucide:message-circle" class="size-4" />{copy.whatsapp}
+        </a>
+        <a href={contactUrl(lang)} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
+          <Icon name="lucide:mail" class="size-4" />{copy.quote}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

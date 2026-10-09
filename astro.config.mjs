@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import fs from 'node:fs';
 import http from 'node:http';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
@@ -41,15 +42,43 @@ function devApiProxy(target) {
   };
 }
 
+/**
+ * Astro emits src/pages/ar/404.astro as ar/404/index.html; Cloudflare Pages
+ * serves the nearest 404.html, so move it to ar/404.html (Arabic 404 for /ar/*).
+ * @returns {import('astro').AstroIntegration}
+ */
+function arabic404() {
+  return {
+    name: 'arabic-404',
+    hooks: {
+      'astro:build:done': ({ dir }) => {
+        const from = new URL('ar/404/index.html', dir);
+        if (!fs.existsSync(from)) return;
+        fs.renameSync(from, new URL('ar/404.html', dir));
+        fs.rmdirSync(new URL('ar/404/', dir));
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: 'https://ductmasters.ae',
   output: 'static',
   trailingSlash: 'always',
+  // English at /, Arabic (UAE) at /ar/ — see src/i18n/
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ar'],
+    routing: { prefixDefaultLocale: false },
+  },
   integrations: [
     icon(),
+    arabic404(),
     sitemap({
       // /lp/ = paid-traffic landing pages (noindex)
-      filter: (page) => !page.includes('/admin/') && !page.includes('/api/') && !page.includes('/lp/'),
+      filter: (page) => !page.includes('/admin/') && !page.includes('/api/') && !page.includes('/lp/') && !page.endsWith('/404/'),
+      // Adds <xhtml:link hreflang> alternates between /x/ and /ar/x/
+      i18n: { defaultLocale: 'en', locales: { en: 'en-AE', ar: 'ar-AE' } },
       changefreq: 'weekly',
       priority: 0.7,
     }),

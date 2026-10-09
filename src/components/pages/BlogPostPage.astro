@@ -1,0 +1,214 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { blogUrl, contactUrl, serviceUrl } from '../../lib/urls';
+import { getService, getBusiness } from '../../i18n/localize';
+import { getLang, localizePath, formatDate, htmlLang } from '../../i18n';
+import { getLocalPage } from '../../data/localPages';
+import { businessRef } from '../../lib/schema';
+import { business } from '../../data/business';
+import { Icon } from 'astro-icon/components';
+import { categoryLabel, readingTimeLabel, type BlogPost } from './blog';
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const lang = getLang(Astro.url);
+const biz = getBusiness(lang);
+
+const copy = {
+  en: {
+    crumb: 'Blog',
+    relatedServices: 'Related Services',
+    inAbuDhabi: (name: string) => `${name} in Abu Dhabi`,
+    ctaHeading: 'Need HVAC Duct Manufacturing?',
+    ctaText:
+      'Duct Masters provides HVAC duct manufacturing and sheet metal fabrication from our facility in Musaffah, Abu Dhabi. Contact us for a competitive quotation on your next project.',
+    call: 'Call',
+    quote: 'Request a Quote',
+  },
+  ar: {
+    crumb: 'المدونة',
+    relatedServices: 'خدمات ذات صلة',
+    inAbuDhabi: (name: string) => `${name} في أبوظبي`,
+    ctaHeading: 'هل تحتاجون إلى تصنيع مجاري التكييف؟',
+    ctaText:
+      'تقدّم دكت ماسترز خدمات تصنيع مجاري التكييف وتشكيل الصفائح المعدنية من منشأتها في مصفح، أبوظبي. تواصلوا معنا للحصول على عرض سعر تنافسي لمشروعكم القادم.',
+    call: 'اتصل على',
+    quote: 'اطلب عرض سعر',
+  },
+}[lang];
+
+const categoryColors: Record<string, { bg: string; text: string }> = {
+  industry: { bg: 'bg-brand-100', text: 'text-brand-700' },
+  guides: { bg: 'bg-accent-100', text: 'text-accent-700' },
+  projects: { bg: 'bg-stone-200', text: 'text-stone-700' },
+  news: { bg: 'bg-stone-100', text: 'text-stone-600' },
+};
+
+const colors = categoryColors[post.data.category] || categoryColors.news;
+
+const displayDate = (iso: string) => formatDate(new Date(iso + 'T00:00:00'), lang);
+
+const postUrl = `${business.website}${blogUrl(post.id, lang)}`;
+const relatedServices = post.data.services
+  .map((slug: string) => getService(slug, lang))
+  .filter(Boolean);
+// Prefer the Abu Dhabi landing page (money page) for each related service
+const serviceLink = (slug: string) => {
+  const path = getLocalPage(slug, null)?.path;
+  return path ? localizePath(path, lang) : serviceUrl(slug, lang);
+};
+// First sentence of the service description
+const firstSentence = (text: string) => {
+  const first = text.split('. ')[0];
+  return lang === 'ar' && first.endsWith('.') ? first : `${first}.`;
+};
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  '@id': `${postUrl}#article`,
+  headline: post.data.title,
+  description: post.data.description,
+  inLanguage: htmlLang[lang],
+  datePublished: post.data.publishDate,
+  dateModified: post.data.updatedDate ?? post.data.publishDate,
+  ...(post.data.image ? { image: new URL(post.data.image, business.website).href } : {}),
+  author: { '@type': 'Organization', name: biz.name, url: `${business.website}${localizePath('/', lang)}` },
+  publisher: businessRef(),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+  about: relatedServices.map((s) => ({ '@id': `${business.website}${serviceUrl(s!.slug)}#service` })),
+};
+
+const breadcrumbs = [
+  { label: copy.crumb, href: blogUrl() },
+  { label: post.data.title },
+];
+---
+
+<BaseLayout
+  title={post.data.seoTitle ?? post.data.title}
+  description={post.data.description}
+  canonicalUrl={postUrl}
+  schema={schema}
+  ogImage={post.data.image}
+  breadcrumbs={breadcrumbs}
+>
+
+  <article>
+    <header class="relative overflow-hidden bg-brand-950">
+      <div class="blueprint-grid-dark animate-grid-pan absolute inset-0 opacity-70"></div>
+      <div class="absolute -top-24 end-0 h-[32rem] w-[32rem] rounded-full bg-accent-500/20 blur-[120px] animate-glow"></div>
+      <div class="absolute bottom-0 start-1/4 h-72 w-72 rounded-full bg-brand-500/20 blur-[100px] animate-float-slow"></div>
+      <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand-950 to-transparent"></div>
+
+      <div class="relative mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">
+        <div data-reveal class="flex flex-wrap items-center gap-3">
+          <span class={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${colors.bg} ${colors.text}`}>
+            {categoryLabel(post.data.category, lang)}
+          </span>
+          {post.data.readingTime && (
+            <span class="flex items-center gap-1 text-xs text-brand-200">
+              <Icon name="lucide:clock" class="size-3" />
+              {readingTimeLabel(post.data.readingTime, lang)}
+            </span>
+          )}
+        </div>
+
+        <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl">
+          {post.data.title}
+        </h1>
+
+        <div data-reveal style="--reveal-delay: 160ms" class="mt-6 flex items-center gap-3 text-sm text-brand-200">
+          <div class="flex items-center gap-1.5">
+            <Icon name="lucide:calendar" class="size-4 text-accent-400" />
+            <time datetime={post.data.publishDate}>
+              {displayDate(post.data.publishDate)}
+            </time>
+          </div>
+          <span class="text-brand-600">|</span>
+          <div class="flex items-center gap-1.5">
+            <Icon name="lucide:user" class="size-4 text-accent-400" />
+            <span>{post.data.author}</span>
+          </div>
+        </div>
+
+        {post.data.tags.length > 0 && (
+          <div data-reveal style="--reveal-delay: 240ms" class="mt-5 flex flex-wrap gap-2">
+            {post.data.tags.map((tag: string) => (
+              <span class="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-xs text-brand-200 backdrop-blur-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-3xl px-5 py-12 lg:px-8 lg:py-16">
+      {post.data.image && (
+        <img
+          src={post.data.image}
+          alt={post.data.imageAlt ?? ''}
+          class="mb-10 w-full rounded-3xl object-cover shadow-xl shadow-brand-900/10 ring-1 ring-stone-900/5"
+          width="1200"
+          height="670"
+          loading="eager"
+        />
+      )}
+      <div class="prose-editorial">
+        <Content />
+      </div>
+
+      {relatedServices.length > 0 && (
+        <aside class="mt-12 rounded-3xl border border-stone-200 bg-white p-6 lg:p-8">
+          <h2 class="font-display text-xl font-bold tracking-tight text-brand-900">{copy.relatedServices}</h2>
+          <ul class="mt-4 space-y-2">
+            {relatedServices.map((s) => (
+              <li>
+                <a href={serviceLink(s!.slug)} class="group inline-flex items-center gap-2 font-semibold text-brand-700 hover:text-brand-900">
+                  <Icon name="lucide:arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+                  {copy.inAbuDhabi(s!.name)}
+                </a>
+                <p class="ms-6 text-sm text-stone-600">{firstSentence(s!.description)}</p>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
+      <div data-reveal class="gradient-border relative mt-16 overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-50 to-accent-50/40 p-8 lg:p-10">
+        <div class="dot-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]"></div>
+        <div class="relative">
+          <h2 class="font-display text-2xl font-bold tracking-tight text-brand-900">
+            {copy.ctaHeading}
+          </h2>
+          <p class="mt-2 text-sm leading-relaxed text-stone-600">
+            {copy.ctaText}
+          </p>
+          <div class="mt-6 flex flex-wrap gap-4">
+            <a
+              href={business.phoneHref}
+              class="btn-shine inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <Icon name="lucide:phone" class="size-4" />
+              {copy.call} <span dir="ltr">{business.phone}</span>
+            </a>
+            <a
+              href={contactUrl(lang)}
+              class="inline-flex items-center gap-2 rounded-xl border border-brand-300 bg-white px-6 py-3.5 text-sm font-semibold text-brand-700 transition-all hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-lg"
+            >
+              <Icon name="lucide:message-square" class="size-4" />
+              {copy.quote}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

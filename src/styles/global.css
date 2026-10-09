@@ -454,15 +454,31 @@ button:focus-visible {
 }
 
 /* ============================================================
-   RTL (Arabic) Support
+   Arabic (RTL)
+   Matches lang="ar" (landing pages) and lang="ar-AE" (site).
+   DM Sans / DM Serif have no Arabic glyphs → IBM Plex Sans Arabic.
    ============================================================ */
 
-[dir='rtl'] {
-  /* Flip text alignment */
-  .text-left { text-align: right; }
-  .text-right { text-align: left; }
+html[lang^='ar'] body,
+html[lang^='ar'] .font-display,
+html[lang^='ar'] .font-body {
+  font-family: 'IBM Plex Sans Arabic', 'DM Sans', sans-serif;
+}
+html[lang^='ar'] .font-display { font-weight: 700; }
 
-  /* Mirror padding/margin utilities where needed */
+/* Letter-spacing breaks the joins between Arabic letters */
+html[lang^='ar'] body,
+html[lang^='ar'] body * {
+  letter-spacing: 0 !important;
+}
+
+/* Arabic needs a little more line height than Latin text */
+html[lang^='ar'] body { line-height: 1.7; }
+
+/* Mirror directional icons (arrows) in RTL */
+[dir='rtl'] .rtl-flip { transform: scaleX(-1); }
+
+[dir='rtl'] {
   .editorial-line {
     padding-left: 0;
     padding-right: 1.25rem;
@@ -471,27 +487,9 @@ button:focus-visible {
     left: auto;
     right: 0;
   }
-
-  /* Flip chevron directions */
-  .lucide-chevron-right,
-  [data-lucide='chevron-right'] {
-    transform: rotate(180deg);
+  .prose-editorial ul,
+  .prose-editorial ol {
+    padding-left: 0;
+    padding-right: 1.5rem;
   }
-
-  /* Mirror flex/grid direction */
-  .flex-row-reverse-rtl { flex-direction: row-reverse; }
-
-  /* Adjust space utilities */
-  .space-x-reverse-rtl > * + * {
-    margin-left: 0;
-    margin-right: var(--tw-space-x-reverse);
-  }
-}
-
-/* Smooth transition when switching language direction */
-html {
-  transition: direction 0s;
-}
-body, body * {
-  transition: text-align 0.3s ease;
 }

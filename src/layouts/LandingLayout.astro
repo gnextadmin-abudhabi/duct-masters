@@ -6,7 +6,7 @@
 //   (plus quote_cta_click and language_switch for engagement)
 // Each event carries cta_position, page_language and lp_name.
 import SEO from '../components/SEO.astro';
-import '../styles/global.css';
+import '../styles/global.css'; // includes the Arabic typography rules
 
 interface Props {
   title: string;
@@ -76,16 +76,6 @@ const { title, description, lpName, schema } = Astro.props;
 
     <slot />
 
-    <style is:global>
-      /* DM Sans / DM Serif have no Arabic glyphs */
-      html[lang='ar'] body,
-      html[lang='ar'] .font-display {
-        font-family: 'IBM Plex Sans Arabic', 'DM Sans', sans-serif;
-        letter-spacing: 0;
-      }
-      html[lang='ar'] .font-display { font-weight: 700; }
-      [dir='rtl'] .rtl-flip { transform: scaleX(-1); }
-    </style>
 
     <script is:inline>
       (() => {

@@ -6,11 +6,15 @@
 // sibling local pages) and to generate each page's title,
 // meta description and H1. Add an entry here whenever a new
 // local page file is created, or it will not be linked.
+// The Arabic mirrors (/ar/<slug>/) are generated from this
+// registry by src/pages/ar/[local].astro.
 // ============================================================
 
 import { business } from './business';
 import { getServiceBySlug } from './serviceTypes';
 import { getAreaBySlug } from './serviceAreas';
+import type { Lang } from '../i18n';
+import { getArea, getService, getBusiness } from '../i18n/localize';
 
 export interface LocalPage {
   /** URL path, with leading and trailing slash */
@@ -49,6 +53,38 @@ const serviceBenefits: Record<string, string> = {
   'supply-delivery': 'Manufactured ductwork delivered on time to site',
   'stainless-steel-duct-fabrication': 'Grade 304 and 316L ductwork with TIG-welded joints',
 };
+
+/** Arabic keyword labels (how each service is searched for in Arabic in the UAE). */
+const serviceLabelsAr: Record<string, string> = {
+  'sheet-metal-fabrication': 'تشكيل الصفائح المعدنية',
+  'duct-fabrication': 'تصنيع مجاري التكييف',
+  'laser-cutting': 'خدمات القص بالليزر',
+  'cnc-forming': 'تشكيل المعادن بماكينات CNC',
+  'welding-services': 'خدمات اللحام الصناعي',
+  'metal-rolling-punching': 'درفلة وتخريم المعادن',
+  'custom-industrial-fabrication': 'تصنيع المعادن حسب الطلب',
+  'powder-coating-finishing': 'الطلاء بالبودرة والتشطيب',
+  'design-engineering': 'تصميم أنظمة مجاري الهواء',
+  'supply-delivery': 'توريد وتركيب مجاري الهواء',
+  'stainless-steel-duct-fabrication': 'تصنيع مجاري الستانلس ستيل',
+};
+
+const serviceBenefitsAr: Record<string, string> = {
+  'sheet-metal-fabrication': 'قص وثني ولحام وتشطيب وفق رسوماتكم',
+  'duct-fabrication': 'مجاري هواء من الحديد المجلفن (GI) والستانلس ستيل حسب الطلب وفق معايير SMACNA',
+  'laser-cutting': 'قص دقيق بالليزر الليفي بماكينات CNC للصفائح والقطع',
+  'cnc-forming': 'ثني بمكابس CNC بدقة ثابتة ومتكررة',
+  'welding-services': 'لحام MIG وTIG واللحام بالقوس للهياكل والدعامات والقطع',
+  'metal-rolling-punching': 'درفلة الألواح والمقاطع والتخريم بماكينات CNC',
+  'custom-industrial-fabrication': 'قطع وتجميعات معدنية مصممة خصيصاً لكل مشروع',
+  'powder-coating-finishing': 'تشطيبات متينة مقاومة للتآكل للقطع المعدنية',
+  'design-engineering': 'رسومات تنفيذية وتخطيط تصنيع مجاري الهواء',
+  'supply-delivery': 'مجاري هواء مصنّعة تُسلَّم إلى الموقع في موعدها',
+  'stainless-steel-duct-fabrication': 'مجاري هواء من الستانلس ستيل 304 و316L بوصلات ملحومة بتقنية TIG',
+};
+
+const benefitFor = (serviceSlug: string, lang: Lang): string | undefined =>
+  (lang === 'ar' ? serviceBenefitsAr : serviceBenefits)[serviceSlug];
 
 export const localPages: LocalPage[] = [
   { path: '/sheet-metal-fabrication-abu-dhabi/', serviceSlug: 'sheet-metal-fabrication', areaSlug: null },
@@ -112,15 +148,21 @@ export const getLocalPagesForService = (serviceSlug: string) =>
 export const getLocalPagesForArea = (areaSlug: string) =>
   localPages.filter((p) => p.areaSlug === areaSlug);
 
-export const serviceLabel = (serviceSlug: string) =>
-  serviceLabels[serviceSlug] ?? getServiceBySlug(serviceSlug)?.name ?? serviceSlug;
+export const serviceLabel = (serviceSlug: string, lang: Lang = 'en') =>
+  lang === 'ar'
+    ? serviceLabelsAr[serviceSlug] ?? getService(serviceSlug, 'ar')?.name ?? serviceSlug
+    : serviceLabels[serviceSlug] ?? getServiceBySlug(serviceSlug)?.name ?? serviceSlug;
 
-export const placeName = (areaSlug: string | null) =>
-  areaSlug ? getAreaBySlug(areaSlug)?.name ?? areaSlug : 'Abu Dhabi';
+export const placeName = (areaSlug: string | null, lang: Lang = 'en') => {
+  if (lang === 'ar') return areaSlug ? getArea(areaSlug, 'ar')?.name ?? areaSlug : 'أبوظبي';
+  return areaSlug ? getAreaBySlug(areaSlug)?.name ?? areaSlug : 'Abu Dhabi';
+};
 
 /** Link text for a local page, e.g. "Laser Cutting Services in ICAD". */
-export const localPageLabel = (page: LocalPage) =>
-  `${serviceLabel(page.serviceSlug)} in ${placeName(page.areaSlug)}`;
+export const localPageLabel = (page: LocalPage, lang: Lang = 'en') =>
+  lang === 'ar'
+    ? `${serviceLabel(page.serviceSlug, 'ar')} في ${placeName(page.areaSlug, 'ar')}`
+    : `${serviceLabel(page.serviceSlug)} in ${placeName(page.areaSlug)}`;
 
 const MAX_TITLE = 60;
 const MAX_DESCRIPTION = 150;
@@ -130,10 +172,23 @@ const pick = (candidates: string[], max: number) =>
   candidates.find((c) => c.length <= max) ??
   candidates.reduce((a, b) => (a.length <= b.length ? a : b));
 
+const brandAr = () => getBusiness('ar').name;
+
 /** Title tag, kept to 60 characters. The brand is appended only when it fits. */
-export const localTitle = (serviceSlug: string, areaSlug: string | null) => {
-  const label = serviceLabel(serviceSlug);
-  const place = placeName(areaSlug);
+export const localTitle = (serviceSlug: string, areaSlug: string | null, lang: Lang = 'en') => {
+  const label = serviceLabel(serviceSlug, lang);
+  const place = placeName(areaSlug, lang);
+  if (lang === 'ar') {
+    return pick(
+      [
+        // Dropping «في» reads as broken Arabic, so drop the brand first
+        `${label} في ${place} | ${brandAr()}`,
+        `${label} في ${place}`,
+        `${label} ${place}`,
+      ],
+      MAX_TITLE,
+    );
+  }
   return pick(
     [
       `${label} in ${place} | ${business.name}`,
@@ -146,14 +201,29 @@ export const localTitle = (serviceSlug: string, areaSlug: string | null) => {
 };
 
 /** H1 — states what and where, without the brand suffix. */
-export const localHeading = (serviceSlug: string, areaSlug: string | null) =>
-  `${serviceLabel(serviceSlug)} in ${placeName(areaSlug)}`;
+export const localHeading = (serviceSlug: string, areaSlug: string | null, lang: Lang = 'en') =>
+  lang === 'ar'
+    ? `${serviceLabel(serviceSlug, 'ar')} في ${placeName(areaSlug, 'ar')}`
+    : `${serviceLabel(serviceSlug)} in ${placeName(areaSlug)}`;
 
 /** Meta description, kept to 150 characters. */
-export const localDescription = (serviceSlug: string, areaSlug: string | null) => {
-  const label = serviceLabel(serviceSlug);
-  const place = placeName(areaSlug);
-  const benefit = serviceBenefits[serviceSlug] ?? '';
+export const localDescription = (serviceSlug: string, areaSlug: string | null, lang: Lang = 'en') => {
+  const label = serviceLabel(serviceSlug, lang);
+  const place = placeName(areaSlug, lang);
+  const benefit = benefitFor(serviceSlug, lang) ?? '';
+  if (lang === 'ar') {
+    // Avoid "في مصفح من مصنعنا في M-40 بمصفح"
+    const factory = areaSlug?.startsWith('musaffah') ? 'من مصنعنا في M-40' : 'من مصنعنا في M-40 بمصفح';
+    return pick(
+      [
+        `${label} في ${place} ${factory}. ${benefit}. اتصل على ${business.phone}.`,
+        `${label} في ${place} ${factory}. ${benefit}.`,
+        `${label} في ${place}. ${benefit}. اتصل على ${business.phone}.`,
+        `${label} في ${place}. ${benefit}.`,
+      ],
+      MAX_DESCRIPTION,
+    );
+  }
   // Avoid "in Musaffah from our M-40 Musaffah factory"
   const factory = place.startsWith('Musaffah') ? 'our M-40 factory' : 'our M-40 Musaffah factory';
   return pick(
@@ -168,14 +238,29 @@ export const localDescription = (serviceSlug: string, areaSlug: string | null) =
 };
 
 /** Service hub (/services/<slug>/) title and description. */
-export const hubTitle = (serviceSlug: string) => {
+export const hubTitle = (serviceSlug: string, lang: Lang = 'en') => {
+  if (lang === 'ar') {
+    const name = getService(serviceSlug, 'ar')?.name ?? serviceLabel(serviceSlug, 'ar');
+    return pick([`${name} | ${brandAr()} الإمارات`, `${name} | ${brandAr()}`, name], MAX_TITLE);
+  }
   const name = getServiceBySlug(serviceSlug)?.name ?? serviceLabel(serviceSlug);
   return pick([`${name} | ${business.name} UAE`, `${name} | ${business.name}`, name], MAX_TITLE);
 };
 
-export const hubDescription = (serviceSlug: string) => {
+export const hubDescription = (serviceSlug: string, lang: Lang = 'en') => {
+  const benefit = benefitFor(serviceSlug, lang) ?? '';
+  if (lang === 'ar') {
+    const name = getService(serviceSlug, 'ar')?.name ?? serviceLabel(serviceSlug, 'ar');
+    return pick(
+      [
+        `${name} من ${brandAr()} في M-40 مصفح. ${benefit}. نخدم أبوظبي وجميع أنحاء الإمارات.`,
+        `${name} من ${brandAr()} في M-40 مصفح. ${benefit}.`,
+        `${name}. ${benefit}.`,
+      ],
+      MAX_DESCRIPTION,
+    );
+  }
   const name = getServiceBySlug(serviceSlug)?.name ?? serviceLabel(serviceSlug);
-  const benefit = serviceBenefits[serviceSlug] ?? '';
   return pick(
     [
       `${name} by ${business.name}, M-40 Musaffah. ${benefit}. Serving Abu Dhabi and the UAE.`,
@@ -187,9 +272,13 @@ export const hubDescription = (serviceSlug: string) => {
 };
 
 /** Hero lead sentence for a local page (visible copy, no phone number). */
-export const localLead = (serviceSlug: string, areaSlug: string | null) => {
-  const place = placeName(areaSlug);
-  const benefit = serviceBenefits[serviceSlug] ?? serviceLabel(serviceSlug);
+export const localLead = (serviceSlug: string, areaSlug: string | null, lang: Lang = 'en') => {
+  const place = placeName(areaSlug, lang);
+  const benefit = benefitFor(serviceSlug, lang) ?? serviceLabel(serviceSlug, lang);
+  if (lang === 'ar') {
+    const origin = areaSlug?.startsWith('musaffah') ? 'هنا في M-40' : 'في منشأتنا في M-40 بمصفح';
+    return `${benefit}، ننفّذها ${origin} ونسلّمها إلى المشاريع في ${place}.`;
+  }
   const origin = place.startsWith('Musaffah') ? 'right here in M-40' : 'at our M-40 Musaffah facility';
   return `${benefit}, made ${origin} and delivered to projects in ${place}.`;
 };

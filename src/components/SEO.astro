@@ -1,5 +1,6 @@
 ---
 import { business } from '../data/business';
+import { getLang, languageUrls, htmlLang, ogLocale, AR_INDEXABLE } from '../i18n';
 
 interface Props {
   title: string;
@@ -10,7 +11,8 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = business.name;
+const lang = getLang(Astro.url);
+const SITE_NAME = lang === 'ar' ? 'دكت ماسترز' : business.name;
 const DEFAULT_OG_IMAGE = business.ogImage;
 
 const {
@@ -33,6 +35,11 @@ const title = rawTitle.includes(SITE_NAME) || branded.length > MAX_TITLE
 // Auto-construct canonical from the current request URL when not provided
 const canonical = canonicalUrl || new URL(Astro.url.pathname, Astro.site).href;
 
+// Language alternates (hreflang) — every page exists at / and /ar/.
+// Skipped on noindex pages (landing pages, 404) and while Arabic is hidden.
+const alternates = noindex || !AR_INDEXABLE ? null : languageUrls(Astro.url, Astro.site);
+const otherLang = lang === 'ar' ? 'en' : 'ar';
+
 // Resolve the OG image to an absolute URL
 const ogImageUrl = new URL(ogImage || DEFAULT_OG_IMAGE, Astro.site).href;
 ---
@@ -44,6 +51,14 @@ const ogImageUrl = new URL(ogImage || DEFAULT_OG_IMAGE, Astro.site).href;
 
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+{alternates && (
+  <>
+    <link rel="alternate" hreflang={htmlLang.en} href={alternates.en} />
+    <link rel="alternate" hreflang={htmlLang.ar} href={alternates.ar} />
+    <link rel="alternate" hreflang="x-default" href={alternates.en} />
+  </>
+)}
+
 <!-- Open Graph -->
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
@@ -51,7 +66,8 @@ const ogImageUrl = new URL(ogImage || DEFAULT_OG_IMAGE, Astro.site).href;
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:site_name" content={SITE_NAME} />
-<meta property="og:locale" content="en_US" />
+<meta property="og:locale" content={ogLocale[lang]} />
+<meta property="og:locale:alternate" content={ogLocale[otherLang]} />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />

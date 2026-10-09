@@ -1,54 +1,46 @@
 ---
-// Language toggle — switches between English and Arabic
-// Sets dir="rtl", lang="ar" on <html>, dispatches langChanged event
+// Switches to the same page in the other language (/contact/ ⇄ /ar/contact/).
+// A plain link so search engines can follow it; the choice is remembered
+// for the landing pages, but visitors are never redirected automatically.
+import { Icon } from 'astro-icon/components';
+import { getLang, alternatePath, htmlLang, useTranslations } from '../i18n';
+
+interface Props {
+  variant?: 'header' | 'drawer';
+}
+
+const { variant = 'header' } = Astro.props;
+const lang = getLang(Astro.url);
+const target = lang === 'ar' ? 'en' : 'ar';
+const t = useTranslations(lang);
+const href = alternatePath(Astro.url);
+
+const classes = {
+  header:
+    'inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-3 text-sm font-semibold text-stone-100 transition-all hover:border-accent-400/50 hover:bg-white/10 hover:text-white',
+  drawer:
+    'flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10',
+};
 ---
 
-<button
-  type="button"
-  id="lang-toggle"
-  class="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-600 transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
-  aria-label="Toggle language"
+<a
+  href={href}
+  hreflang={htmlLang[target]}
+  lang={htmlLang[target]}
+  data-set-lang={target}
+  title={t.switchToLabel}
+  aria-label={t.switchToLabel}
+  class={classes[variant]}
 >
-  <span id="lang-label">العربية</span>
-  <span class="text-[10px]">AR</span>
-</button>
+  <Icon name="lucide:languages" class="size-4 text-accent-400" />
+  <span>{t.switchTo}</span>
+</a>
 
 <script>
-  function switchBilingualContent(lang) {
-    document.querySelectorAll('.bilingual').forEach(el => {
-      const text = el.getAttribute('data-lang-' + lang);
-      if (text) el.textContent = text;
+  // Bundled once per page even though the toggle renders twice (header + drawer)
+  document.querySelectorAll<HTMLAnchorElement>('[data-set-lang]').forEach((a) => {
+    a.addEventListener('click', () => {
+      try { localStorage.setItem('ductmasters-lang', a.dataset.setLang ?? ''); } catch { /* storage blocked */ }
     });
-    document.querySelectorAll('[data-lang-placeholder-en]').forEach(el => {
-      const ph = el.getAttribute('data-lang-placeholder-' + lang);
-      if (ph) el.setAttribute('placeholder', ph);
-    });
-  }
-
-  function applyLang(lang) {
-    const html = document.documentElement;
-    const label = document.getElementById('lang-label');
-    if (lang === 'ar') {
-      html.dir = 'rtl';
-      html.lang = 'ar';
-      if (label) label.textContent = 'English';
-    } else {
-      html.dir = 'ltr';
-      html.lang = 'en';
-      if (label) label.textContent = 'العربية';
-    }
-    // Switch bilingual content
-    switchBilingualContent(lang);
-    // Dispatch event for other components
-    document.dispatchEvent(new CustomEvent('langChanged', { detail: { lang } }));
-    try { localStorage.setItem('ductmasters-lang', lang); } catch {}
-  }
-
-  const saved = (() => { try { return localStorage.getItem('ductmasters-lang'); } catch { return null; } })();
-  if (saved === 'ar') applyLang('ar');
-
-  document.getElementById('lang-toggle')?.addEventListener('click', () => {
-    const isAr = document.documentElement.dir === 'rtl';
-    applyLang(isAr ? 'en' : 'ar');
   });
 </script>

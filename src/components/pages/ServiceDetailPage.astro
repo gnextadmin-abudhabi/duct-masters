@@ -1,0 +1,246 @@
+---
+// Service hub page (/services/<slug>/ and /ar/services/<slug>/)
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness } from '../../data/business';
+import { serviceUrl, areaUrl, contactUrl } from '../../lib/urls';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeoFaq from '../SeoFaq.astro';
+import LocalPageLinks from '../LocalPageLinks.astro';
+import RelatedPosts from '../RelatedPosts.astro';
+import { getLocalPagesForService, hubTitle, hubDescription } from '../../data/localPages';
+import { serviceSchema, areaServedList } from '../../lib/schema';
+import { getLang, htmlLang } from '../../i18n';
+import { getService, getAreas, getBusiness } from '../../i18n/localize';
+
+interface Props {
+  serviceSlug: string;
+}
+
+const { serviceSlug } = Astro.props;
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
+const service = getService(serviceSlug, lang);
+if (!service) throw new Error(`Unknown service "${serviceSlug}"`);
+const b = getBusiness(lang);
+const years = yearsInBusiness();
+const nameLower = isAr ? service.name : service.name.toLowerCase();
+
+const copy = {
+  en: {
+    call: 'Call',
+    quote: 'Request a Quote',
+    imageAlt: `${service.name} by ${b.name}`,
+    processBadge: 'Process',
+    processHeading: `Our ${service.name} Process`,
+    processIntro: 'Every project follows a structured process to ensure quality and accuracy.',
+    areasHeading: `Areas We Serve for ${service.name}`,
+    areasIntro: `We provide ${nameLower} to locations across ${b.serviceRadius}.`,
+    areasSelect: 'Select your area for local details.',
+    localHeading: `${service.name} by Location`,
+    localIntro: `Local details, delivery and FAQs for ${nameLower} in each area we serve:`,
+    ctaHeading: `Need ${service.name}?`,
+    ctaText1: `${b.name} has been serving Abu Dhabi and the UAE for over ${years} years.`,
+    ctaText2: `Contact us for a competitive quotation for ${nameLower}.`,
+    crumb: 'Services',
+  },
+  ar: {
+    call: 'اتصل',
+    quote: 'اطلب عرض سعر',
+    imageAlt: `${service.name} من ${b.name}`,
+    processBadge: 'مراحل العمل',
+    processHeading: `مراحل تنفيذ ${service.name}`,
+    processIntro: 'يمر كل مشروع بمراحل عمل منظّمة لضمان الجودة والدقة.',
+    areasHeading: `المناطق التي نقدّم فيها ${service.name}`,
+    areasIntro: `نقدّم ${service.name} للمشاريع في ${b.serviceRadius}.`,
+    areasSelect: 'اختر منطقتك للاطلاع على التفاصيل المحلية.',
+    localHeading: `${service.name} حسب المنطقة`,
+    localIntro: `تفاصيل محلية ومعلومات التسليم والأسئلة الشائعة حول ${service.name} في كل منطقة نخدمها:`,
+    ctaHeading: `هل تحتاج إلى ${service.name}؟`,
+    ctaText1: `تخدم ${b.name} أبوظبي ودولة الإمارات منذ أكثر من ${years} عاماً.`,
+    ctaText2: `تواصل معنا للحصول على عرض سعر تنافسي لـ${service.name}.`,
+    crumb: 'الخدمات',
+  },
+}[lang];
+
+const pageTitle = hubTitle(service.slug, lang);
+const metaDescription = hubDescription(service.slug, lang);
+
+const schema = {
+  ...serviceSchema({
+    url: serviceUrl(service.slug, lang),
+    name: service.name,
+    serviceType: service.name,
+    description: service.description,
+    image: service.image,
+    areaServed: areaServedList(getAreas(lang)),
+  }),
+  inLanguage: htmlLang[lang],
+};
+
+const breadcrumbs = [
+  { label: copy.crumb, href: '/services/' },
+  { label: service.name },
+];
+---
+
+<BaseLayout title={pageTitle} description={metaDescription} schema={schema} breadcrumbs={breadcrumbs}>
+
+  <!-- ===== HERO ===== -->
+  <section class="relative -mt-24 overflow-hidden bg-brand-950 pt-32 pb-20 lg:-mt-[108px] lg:pt-40 lg:pb-28">
+    <div class="absolute inset-0">
+      <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
+      <div class="absolute -top-24 end-0 h-[34rem] w-[34rem] rounded-full bg-accent-500/20 blur-[130px] animate-glow"></div>
+      <div class="absolute bottom-0 start-1/4 h-80 w-80 rounded-full bg-brand-500/20 blur-[110px] animate-float-slow"></div>
+    </div>
+    <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <span data-reveal class="inline-flex size-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-accent-400 shadow-lg backdrop-blur-sm">
+            <Icon name={service.icon} class="size-7" />
+          </span>
+          <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            {service.name}
+          </h1>
+          <p data-reveal style="--reveal-delay: 160ms" class="mt-6 max-w-xl text-lg leading-relaxed text-brand-100">
+            {service.description}
+          </p>
+          <div data-reveal style="--reveal-delay: 240ms" class="mt-9 flex flex-wrap gap-4">
+            <a href={business.phoneHref} class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50">
+              <Icon name="lucide:phone" class="size-4 transition-transform group-hover:rotate-12" />{copy.call} <span dir="ltr">{business.phone}</span>
+            </a>
+            <a href={contactUrl(lang)} class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10">
+              <Icon name="lucide:file-text" class="size-4" />{copy.quote}
+            </a>
+          </div>
+        </div>
+        <div data-reveal="right" class="relative">
+          <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-accent-500/20 to-brand-500/10 blur-2xl"></div>
+          <div class="relative overflow-hidden rounded-3xl ring-1 ring-white/10 shadow-2xl shadow-brand-950/60 animate-float-slow">
+            <img
+              src={service.image}
+              alt={copy.imageAlt}
+              class="aspect-[4/3] w-full object-cover"
+              width="1024"
+              height="1024"
+              loading="eager"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/40 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROCESS TIMELINE ===== -->
+  <section class="relative overflow-hidden bg-stone-50 py-20 lg:py-28">
+    <div class="dot-grid absolute inset-0 opacity-40"></div>
+    <div class="relative mx-auto max-w-4xl px-5 lg:px-8">
+      <div class="text-center">
+        <span data-reveal class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-700 shadow-sm">
+          <Icon name="lucide:list-checks" class="size-3.5" />{copy.processBadge}
+        </span>
+        <h2 data-reveal style="--reveal-delay: 80ms" class="mt-5 font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">
+          {copy.processHeading}
+        </h2>
+        <p data-reveal style="--reveal-delay: 140ms" class="mx-auto mt-4 max-w-2xl text-stone-600">
+          {copy.processIntro}
+        </p>
+      </div>
+
+      <div class="relative mt-14">
+        <div class="absolute bottom-4 start-6 top-4 w-px bg-gradient-to-b from-accent-500 via-brand-400 to-transparent"></div>
+        <div class="space-y-5">
+          {service.process.map((step, index) => (
+            <div data-reveal="left" style={`--reveal-delay: ${index * 90}ms`} class="group relative flex items-start gap-5 sm:gap-6">
+              <div class="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500 to-brand-500 font-display text-lg font-bold text-white shadow-lg shadow-accent-600/30 ring-4 ring-stone-50 transition-transform duration-300 group-hover:scale-110">
+                {index + 1}
+              </div>
+              <div class="flex-1 rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-brand-200 group-hover:shadow-xl group-hover:shadow-brand-900/10">
+                <h3 class="font-display text-lg font-bold tracking-tight text-brand-900">{step.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-stone-600">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AREAS SERVED ===== -->
+  <section class="bg-white py-20 lg:py-28">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 data-reveal class="font-display text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">
+        {copy.areasHeading}
+      </h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mt-3 max-w-2xl text-stone-600">
+        {copy.areasIntro}
+        {copy.areasSelect}
+      </p>
+
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {getAreas(lang).filter(a => a.featured).map((area, i) => (
+          <a
+            href={areaUrl(area.slug, lang)}
+            data-reveal
+            data-spotlight
+            style={`--reveal-delay: ${(i % 4) * 80}ms`}
+            class="group spotlight-card gradient-border relative flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-900/5"
+          >
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 transition-colors group-hover:bg-brand-500 group-hover:ring-brand-500">
+              <Icon name="lucide:map-pin" class="size-5 text-brand-600 transition-colors group-hover:text-white" />
+            </div>
+            <div class="min-w-0">
+              <span class="font-semibold text-stone-800 transition-colors group-hover:text-brand-800">{area.name}</span>
+              <p class="mt-0.5 text-sm text-stone-500">{area.county}</p>
+            </div>
+            <Icon name="lucide:arrow-up-right" class="ms-auto size-4 text-stone-300 transition-all rtl:-scale-x-100 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand-500" />
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <LocalPageLinks
+    pages={getLocalPagesForService(service.slug)}
+    heading={copy.localHeading}
+    intro={copy.localIntro}
+  />
+
+  <RelatedPosts serviceSlug={service.slug} />
+
+  <div class="border-t border-stone-200/60 bg-white">
+    <SeoFaq service={service} />
+  </div>
+
+  <!-- ===== CTA ===== -->
+  <section class="relative overflow-hidden bg-brand-950 py-20 lg:py-24">
+    <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/85 to-brand-900"></div>
+    <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>
+    <div class="relative mx-auto max-w-4xl px-5 text-center lg:px-8">
+      <h2 data-reveal class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        {copy.ctaHeading}
+      </h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
+        {copy.ctaText1}
+        {copy.ctaText2}
+      </p>
+      <div data-reveal style="--reveal-delay: 160ms" class="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a
+          href={business.phoneHref}
+          class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"
+        >
+          <Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" />
+          <span dir="ltr">{business.phone}</span>
+        </a>
+        <a
+          href={contactUrl(lang)}
+          class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"
+        >
+          <Icon name="lucide:mail" class="size-5" />
+          {copy.quote}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

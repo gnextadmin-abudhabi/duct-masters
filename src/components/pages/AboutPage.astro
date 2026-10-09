@@ -1,0 +1,240 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { business, yearsInBusiness } from '../../data/business';
+import { getLang, localizePath, htmlLang } from '../../i18n';
+import { getBusiness, getAreas } from '../../i18n/localize';
+
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
+const biz = getBusiness(lang);
+const areas = getAreas(lang);
+const years = yearsInBusiness();
+const est = business.yearEstablished;
+
+const aboutSchema = isAr
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      url: new URL(localizePath('/about/', lang), business.website).href,
+      name: 'عن دكت ماسترز',
+      description: `دكت ماسترز شركة متخصصة في تصنيع مجاري التكييف وتشكيل الصفائح المعدنية في أبوظبي. تعرّف على منشأتنا وقدراتنا وخبرتنا التي تزيد على ${years} عاماً في خدمة الإمارات.`,
+      inLanguage: htmlLang[lang],
+      about: { '@id': `${business.website}/#business` },
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: `About ${business.name}`,
+      description: `${business.name} is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company. Learn about our facility, capabilities, and ${years}+ years of experience serving the UAE.`,
+      about: { '@id': `${business.website}/#business` },
+    };
+
+const values = isAr
+  ? [
+      { icon: 'lucide:ruler', title: 'الدقة', desc: 'نصنّع كل قطعة وفق المواصفات المطلوبة تماماً باستخدام ماكينات CNC وإجراءات ضبط الجودة.' },
+      { icon: 'lucide:shield-check', title: 'الموثوقية', desc: 'تسليم في الموعد وجودة ثابتة — ندرك أن نجاح المشاريع يعتمد على موردين يُعتمد عليهم.' },
+      { icon: 'lucide:users', title: 'الشراكة', desc: 'نعمل عن قرب مع المقاولين والاستشاريين وفرق المشاريع لضمان الالتزام بالمواصفات والجداول الزمنية.' },
+      { icon: 'lucide:trending-up', title: 'التطوير المستمر', desc: 'نستثمر في المعدات الحديثة والتدريب لتطوير قدراتنا التصنيعية وجودة خدماتنا باستمرار.' },
+    ]
+  : [
+      { icon: 'lucide:ruler', title: 'Precision', desc: 'Every component is manufactured to exact specifications using CNC machinery and quality control processes.' },
+      { icon: 'lucide:shield-check', title: 'Reliability', desc: 'On-time delivery and consistent quality — we understand that projects depend on dependable suppliers.' },
+      { icon: 'lucide:users', title: 'Partnership', desc: 'We work closely with contractors, consultants, and project teams to ensure specifications are met and schedules are maintained.' },
+      { icon: 'lucide:trending-up', title: 'Continuous Improvement', desc: 'We invest in modern equipment and training to continuously improve our manufacturing capabilities and service quality.' },
+    ];
+
+const quickFacts = [
+  { icon: 'lucide:calendar', label: isAr ? 'سنة التأسيس' : 'Established', value: est },
+  { icon: 'lucide:map-pin', label: isAr ? 'الموقع' : 'Location', value: biz.address.street },
+  { icon: 'lucide:shield-check', label: isAr ? 'الترخيص' : 'License', value: biz.license },
+  { icon: 'lucide:route', label: isAr ? 'نطاق الخدمة' : 'Service Area', value: biz.serviceRadius },
+];
+
+const t = isAr
+  ? {
+      title: 'عن دكت ماسترز | مصنع مجاري التكييف في أبوظبي',
+      description: `تصنع دكت ماسترز مجاري التكييف وقطع الصفائح المعدنية في M-40 مصفح، أبوظبي منذ ${est}. تعرّف على منشأتنا وفريقنا وقدراتنا.`,
+      crumb: 'من نحن',
+      h1: 'عن دكت ماسترز',
+      heroText: `${biz.tagline}. أكثر من ${years} عاماً من الخبرة في التصنيع لخدمة المقاولين والمشاريع في جميع أنحاء الإمارات.`,
+      storyTitle: 'قصتنا',
+      story1: `تأسست دكت ماسترز عام ${est}، ونمت لتصبح من الشركات الرائدة في تصنيع مجاري التكييف وتشكيل الصفائح المعدنية في أبوظبي. ومن منشأتنا في ${biz.address.street}، نخدم المشاريع التجارية والصناعية والإنشائية ومشاريع البنية التحتية في أبوظبي وسائر أنحاء الإمارات.`,
+      story2: 'بتركيزنا على جودة التصنيع ودقة الإنتاج والدعم الموثوق للمشاريع، بنينا سمعة قوية في تسليم منتجات معدنية مصنّعة ومجاري هواء تلبي أعلى المعايير. ويجمع فريقنا بين الحرفية العالية وماكينات CNC الحديثة لتنفيذ المشاريع بمختلف أحجامها.',
+      teamAlt: 'فريق التصنيع في دكت ماسترز',
+      facilityAlt: 'منشأة دكت ماسترز للتصنيع في مصفح',
+      facilityTitle: 'منشأتنا',
+      facilityText: 'منشأة التصنيع لدينا في مصفح بأبوظبي مجهزة بماكينات قص بالليزر CNC وماكينات ثني CNC وماكينات قص الصفائح ومعدات الدرفلة ومحطات اللحام وخط للطلاء بالبودرة. وهذا يتيح لنا تقديم مجموعة متكاملة من خدمات التصنيع تحت سقف واحد — من الصفائح المعدنية الخام إلى منتجات نهائية مطلية وجاهزة للتركيب.',
+      valuesTitle: 'قيمنا',
+      areasTitle: 'مناطق الخدمة',
+      areasText: 'من مقرنا في مصفح، نسلّم مجاري التكييف والمنتجات المعدنية المصنّعة إلى مواقع في جميع أنحاء أبوظبي والإمارات، ومنها:',
+      more: '…والمزيد في جميع أنحاء الإمارات',
+      ctaTitle: 'اطلب عرض سعر',
+      ctaText: 'أرسل لنا تفاصيل مشروعك لتحصل على عرض سعر تنافسي.',
+    }
+  : {
+      title: `About ${business.name} | HVAC Duct Manufacturer Abu Dhabi`,
+      description: `${business.name} has made HVAC ductwork and sheet metal parts in M-40 Musaffah, Abu Dhabi since ${est}. Our facility, team and capabilities.`,
+      crumb: 'About',
+      h1: 'About Duct Masters',
+      heroText: `${biz.tagline}. ${years}+ years of manufacturing experience serving contractors and projects across the UAE.`,
+      storyTitle: 'Our Story',
+      story1: `${business.name} (${business.legalName}) was established in ${est} and has grown into one of Abu Dhabi's leading HVAC duct manufacturing and sheet metal fabrication companies. Operating from our facility in ${business.address.street}, we serve commercial, industrial, construction, and infrastructure projects across Abu Dhabi and the wider UAE.`,
+      story2: 'With a focus on quality manufacturing, accurate production, and reliable project support, we have built a reputation for delivering fabricated metal products and ductwork that meet the highest standards. Our team combines skilled craftsmanship with modern CNC machinery to handle projects of all sizes.',
+      teamAlt: 'Duct Masters fabrication team',
+      facilityAlt: 'Duct Masters manufacturing facility in Musaffah',
+      facilityTitle: 'Our Facility',
+      facilityText: 'Our manufacturing facility in Musaffah, Abu Dhabi, is equipped with CNC laser cutters, CNC press brakes, shearing machines, rolling equipment, welding stations, and powder coating capabilities. This allows us to offer a complete range of fabrication services under one roof — from raw sheet metal to finished, coated products ready for installation.',
+      valuesTitle: 'Our Values',
+      areasTitle: 'Service Areas',
+      areasText: 'From our base in Musaffah, we deliver HVAC ductwork and fabricated metal products to locations across Abu Dhabi and the UAE, including:',
+      more: '…and more across the UAE',
+      ctaTitle: 'Get a Quote',
+      ctaText: 'Send us your project details for a competitive quotation.',
+    };
+---
+
+<BaseLayout
+  title={t.title}
+  description={t.description}
+  schema={aboutSchema}
+  breadcrumbs={[{ label: t.crumb }]}
+>
+  <!-- Hero -->
+  <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">
+    <div class="absolute inset-0">
+      <img src="/images/gallery/logo-on-uniform.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
+      <div class="absolute inset-0 bg-gradient-to-b from-brand-950/92 via-brand-950/82 to-brand-950/96"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,_rgba(46,104,156,0.28),_transparent_70%)]"></div>
+      <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
+    </div>
+    <div class="relative mx-auto w-full max-w-3xl px-5 text-center lg:px-8">
+      <span data-reveal class="mx-auto inline-flex size-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm">
+        <Icon name="lucide:building-2" class="size-7" />
+      </span>
+      <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">{t.h1}</h1>
+      <p data-reveal style="--reveal-delay: 160ms" class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-brand-100">
+        {t.heroText}
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== OUR STORY ===== -->
+  <section class="relative overflow-hidden bg-white py-20 lg:py-28">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
+        <div data-reveal={isAr ? 'right' : 'left'}>
+          <h2 class="font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{t.storyTitle}</h2>
+          <div class="mt-6 space-y-4 text-lg leading-relaxed text-stone-600">
+            <p>{t.story1}</p>
+            <p>{t.story2}</p>
+          </div>
+        </div>
+        <div data-reveal={isAr ? 'left' : 'right'} class="relative">
+          <div class="dot-grid absolute -start-6 -top-6 h-28 w-28 rounded-2xl border border-brand-200 opacity-70"></div>
+          <div class="relative overflow-hidden rounded-3xl shadow-2xl shadow-brand-900/20 ring-1 ring-stone-900/5 animate-float-slow">
+            <img src="/images/gallery/factory-uniforms.webp" alt={t.teamAlt} class="aspect-[4/3] w-full object-cover" width="1200" height="670" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/30 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUICK FACTS BAND ===== -->
+  <section class="border-y border-stone-200/60 bg-stone-50 py-16 lg:py-20">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {quickFacts.map((f, i) => (
+          <div data-reveal style={`--reveal-delay: ${i * 80}ms`} class="group rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-brand-900/10">
+            <div class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500/15 to-brand-500/10 ring-1 ring-brand-100 transition-all duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:from-accent-500 group-hover:to-brand-500">
+              <Icon name={f.icon} class="size-6 text-brand-600 transition-colors group-hover:text-white" />
+            </div>
+            <p class="mt-4 font-display text-xl font-bold tracking-tight text-brand-900">{f.value}</p>
+            <p class="mt-1 text-xs font-semibold uppercase tracking-wider text-stone-500">{f.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== OUR FACILITY ===== -->
+  <section class="bg-white py-20 lg:py-28">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
+        <div data-reveal={isAr ? 'right' : 'left'} class="relative order-2 lg:order-1">
+          <div class="dot-grid absolute -bottom-6 -end-6 h-28 w-28 rounded-2xl border border-brand-200 opacity-70"></div>
+          <div class="relative overflow-hidden rounded-3xl shadow-2xl shadow-brand-900/20 ring-1 ring-stone-900/5">
+            <img src="/images/gallery/factory-workshop.webp" alt={t.facilityAlt} class="aspect-[4/3] w-full object-cover" width="1200" height="670" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/30 to-transparent"></div>
+          </div>
+        </div>
+        <div data-reveal={isAr ? 'left' : 'right'} class="order-1 lg:order-2">
+          <h2 class="font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{t.facilityTitle}</h2>
+          <p class="mt-6 text-lg leading-relaxed text-stone-600">
+            {t.facilityText}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== OUR VALUES ===== -->
+  <section class="relative overflow-hidden bg-stone-50 py-20 lg:py-28">
+    <div class="dot-grid absolute inset-0 opacity-40"></div>
+    <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
+      <h2 data-reveal class="text-center font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{t.valuesTitle}</h2>
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {values.map((v, i) => (
+          <div data-reveal data-spotlight style={`--reveal-delay: ${i * 90}ms`} class="group spotlight-card gradient-border relative rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-brand-900/10">
+            <div class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-500/15 to-brand-500/10 ring-1 ring-brand-100 transition-all duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:from-accent-500 group-hover:to-brand-500">
+              <Icon name={v.icon} class="size-6 text-brand-600 transition-colors group-hover:text-white" />
+            </div>
+            <h3 class="mt-4 font-display text-lg font-bold tracking-tight text-brand-900">{v.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone-600">{v.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICE AREAS ===== -->
+  <section class="bg-white py-20 lg:py-28">
+    <div class="mx-auto max-w-4xl px-5 text-center lg:px-8">
+      <h2 data-reveal class="font-display text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{t.areasTitle}</h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">
+        {t.areasText}
+      </p>
+      <div data-reveal style="--reveal-delay: 140ms" class="mt-8 flex flex-wrap justify-center gap-3">
+        {areas.filter(a => a.featured).map((area) => (
+          <span class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-medium text-stone-700 transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700">
+            <Icon name="lucide:map-pin" class="size-4 text-brand-500" />{area.name}
+          </span>
+        ))}
+        <span class="inline-flex items-center rounded-full border border-dashed border-stone-300 bg-transparent px-4 py-2 text-sm font-medium text-stone-500">{t.more}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GET A QUOTE CTA ===== -->
+  <section class="relative overflow-hidden bg-brand-950 py-20 lg:py-24">
+    <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/85 to-brand-900"></div>
+    <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px] animate-glow"></div>
+    <div class="relative mx-auto max-w-3xl px-5 text-center lg:px-8">
+      <h2 data-reveal class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">{t.ctaTitle}</h2>
+      <p data-reveal style="--reveal-delay: 80ms" class="mx-auto mt-4 max-w-xl text-lg text-brand-200">
+        {t.ctaText}
+      </p>
+      <div data-reveal style="--reveal-delay: 160ms" class="mt-8 flex justify-center">
+        <a
+          href={business.phoneHref}
+          class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-accent-600/50"
+        >
+          <Icon name="lucide:phone" class="size-5 transition-transform group-hover:rotate-12" />
+          <span dir="ltr">{business.phone}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

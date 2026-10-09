@@ -1,19 +1,23 @@
 ---
 // Grid of links to service × location landing pages (see src/data/localPages.ts).
+// Language-aware: on /ar/ pages the labels are Arabic and links point to /ar/<slug>/.
 import { Icon } from 'astro-icon/components';
 import { localPageLabel } from '../data/localPages';
 import type { LocalPage } from '../data/localPages';
+import { getLang, localizePath, basePath } from '../i18n';
 
 interface Props {
   pages: LocalPage[];
   heading: string;
   intro?: string;
-  /** Path of the page rendering this block — excluded from the list */
+  /** Path of the page rendering this block — excluded from the list (English or /ar/ path) */
   currentPath?: string;
 }
 
+const lang = getLang(Astro.url);
 const { pages, heading, intro, currentPath } = Astro.props;
-const links = pages.filter((p) => p.path !== currentPath);
+const current = currentPath ? basePath(currentPath) : undefined;
+const links = pages.filter((p) => p.path !== current);
 ---
 
 {links.length > 0 && (
@@ -25,12 +29,12 @@ const links = pages.filter((p) => p.path !== currentPath);
         {links.map((page) => (
           <li>
             <a
-              href={page.path}
+              href={localizePath(page.path, lang)}
               class="group flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-semibold text-stone-800 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:bg-white hover:text-brand-800 hover:shadow-lg hover:shadow-brand-900/5"
             >
               <Icon name="lucide:map-pin" class="size-4 shrink-0 text-brand-600" />
-              <span>{localPageLabel(page)}</span>
-              <Icon name="lucide:arrow-right" class="ml-auto size-4 shrink-0 text-stone-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500" />
+              <span>{localPageLabel(page, lang)}</span>
+              <Icon name="lucide:arrow-right" class="ms-auto size-4 shrink-0 text-stone-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
             </a>
           </li>
         ))}

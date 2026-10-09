@@ -1,0 +1,27 @@
+---
+// Arabic mirrors of the root-level service × location pages
+// (/ar/hvac-duct-manufacturing-musaffah/ etc.), generated from the
+// registry in src/data/localPages.ts. Only the registry slugs are
+// produced, so this never collides with the other /ar/ routes.
+import ComboPage from '../../components/pages/ComboPage.astro';
+import ServicePage from '../../components/pages/ServicePage.astro';
+import { localPages, type LocalPage } from '../../data/localPages';
+
+export function getStaticPaths() {
+  return localPages.map((page) => ({
+    // Registry paths have a leading and trailing slash: "/laser-cutting-services-icad/"
+    params: { local: page.path.replace(/^\/+|\/+$/g, '') },
+    props: { page },
+  }));
+}
+
+interface Props {
+  page: LocalPage;
+}
+
+const { page } = Astro.props;
+---
+
+{page.areaSlug
+  ? <ComboPage serviceSlug={page.serviceSlug} areaSlug={page.areaSlug} />
+  : <ServicePage serviceSlug={page.serviceSlug} />}

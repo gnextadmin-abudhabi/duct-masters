@@ -1,0 +1,12 @@
+---
+import { industries } from '../../../data/industries';
+import IndustryDetailPage from '../../../components/pages/IndustryDetailPage.astro';
+
+export function getStaticPaths() {
+  return industries.map((industry) => ({ params: { industry: industry.slug } }));
+}
+
+const { industry } = Astro.params;
+---
+
+<IndustryDetailPage industrySlug={industry} />

@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../../data/business';
+import { serviceUrl, contactUrl } from '../../lib/urls';
+import { getLang, localizePath, htmlLang } from '../../i18n';
+import { getBusiness, getServices } from '../../i18n/localize';
+
+const lang = getLang(Astro.url);
+const isAr = lang === 'ar';
+const biz = getBusiness(lang);
+const services = getServices(lang);
+
+const t = isAr
+  ? {
+      title: 'خدمات تصنيع مجاري التكييف والمعادن | دكت ماسترز',
+      description: 'تصنيع مجاري التكييف وتشكيل الصفائح المعدنية والقص بالليزر وتشكيل CNC واللحام والطلاء بالبودرة من منشأتنا في M-40 مصفح، أبوظبي.',
+      listName: 'خدمات التصنيع',
+      listDescription: `تقدّم دكت ماسترز مجموعة متكاملة من خدمات تصنيع مجاري التكييف والأعمال المعدنية في ${biz.serviceRadius}.`,
+      crumb: 'الخدمات',
+      h1: 'خدمات التصنيع لدينا',
+      intro: `تقدّم دكت ماسترز حلولاً متكاملة للأعمال المعدنية من منشأتها في مصفح بأبوظبي. من تصنيع مجاري التكييف إلى القص بالليزر عالي الدقة وتشكيل CNC واللحام والتصنيع الصناعي حسب الطلب — ننفّذ المشاريع بمختلف أحجامها في ${biz.serviceRadius}.`,
+      ctaTitle: 'تحتاج عرض سعر لتصنيع حسب الطلب؟',
+      ctaText: 'أرسل لنا رسومات مشروعك ومواصفاته، ونقدّم لك عروض أسعار تنافسية لجميع خدمات التصنيع.',
+      quote: 'اطلب عرض سعر',
+    }
+  : {
+      title: `Fabrication Services | ${business.name}`,
+      description: `HVAC duct manufacturing, sheet metal fabrication, laser cutting, CNC forming, welding and powder coating from our M-40 Musaffah facility.`,
+      listName: 'Fabrication Services',
+      listDescription: `${business.name} offers a full range of HVAC duct manufacturing and metal fabrication services across ${business.serviceRadius}.`,
+      crumb: 'Services',
+      h1: 'Our Fabrication Services',
+      intro: `${business.name} provides complete metal fabrication solutions from our facility in Musaffah, Abu Dhabi. From HVAC duct manufacturing to precision laser cutting, CNC forming, welding, and custom industrial fabrication — we handle projects of all sizes across ${business.serviceRadius}.`,
+      ctaTitle: 'Need a Custom Fabrication Quote?',
+      ctaText: 'Send us your project drawings and specifications. We provide competitive quotations for all fabrication services.',
+      quote: 'Request a Quote',
+    };
+
+const servicesSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: t.listName,
+  description: t.listDescription,
+  ...(isAr ? { url: new URL(localizePath('/services/', lang), business.website).href, inLanguage: htmlLang[lang] } : {}),
+  itemListElement: services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Service',
+      '@id': `${business.website}${serviceUrl(s.slug, lang)}#service`,
+      name: s.name,
+      url: `${business.website}${serviceUrl(s.slug, lang)}`,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title={t.title}
+  description={t.description}
+  schema={servicesSchema}
+  breadcrumbs={[{ label: t.crumb }]}
+>
+
+  <section class="relative -mt-28 flex min-h-[60vh] items-center overflow-hidden bg-brand-950 pt-32 pb-24 lg:-mt-[140px] lg:min-h-[64vh] lg:pt-40 lg:pb-28">
+    <div class="absolute inset-0">
+      <img src="/images/gallery/laser-machine-operator.webp" alt="" class="h-full w-full object-cover" width="1200" height="670" loading="eager" />
+      <div class="absolute inset-0 bg-gradient-to-b from-brand-950/92 via-brand-950/82 to-brand-950/96"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,_rgba(46,104,156,0.28),_transparent_70%)]"></div>
+      <div class="blueprint-grid-dark absolute inset-0 opacity-30"></div>
+    </div>
+    <div class="relative mx-auto w-full max-w-3xl px-5 text-center lg:px-8">
+      <span data-reveal class="mx-auto inline-flex size-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm">
+        <Icon name="lucide:wrench" class="size-7" />
+      </span>
+      <h1 data-reveal style="--reveal-delay: 80ms" class="mt-6 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+        {t.h1}
+      </h1>
+      <p data-reveal style="--reveal-delay: 160ms" class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-brand-100">
+        {t.intro}
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-gradient-to-b from-stone-50 via-white to-stone-50 py-16 lg:py-24">
+    <div class="mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+        {services.map((service, i) => (
+          <a
+            href={serviceUrl(service.slug, lang)}
+            data-reveal
+            style={`--reveal-delay: ${Math.min(i, 8) * 45}ms`}
+            class="group relative grid grid-cols-[auto_1fr_auto] items-center gap-5 border-b border-stone-100 px-5 py-6 transition-colors last:border-b-0 hover:bg-stone-50/70 sm:gap-8 sm:px-8"
+          >
+            <span class="absolute start-0 top-0 h-full w-1 origin-top scale-y-0 bg-gradient-to-b from-accent-500 to-brand-500 transition-transform duration-300 group-hover:scale-y-100"></span>
+            <span class="font-display text-3xl font-bold tabular-nums text-stone-200 transition-colors group-hover:text-accent-500 sm:text-4xl">{String(i + 1).padStart(2, '0')}</span>
+            <div class="min-w-0">
+              <div class="flex items-center gap-3">
+                <span class="hidden size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent-500/15 to-brand-500/10 ring-1 ring-brand-100 transition-all duration-300 group-hover:from-accent-500 group-hover:to-brand-500 sm:flex">
+                  <Icon name={service.icon} class="size-5 text-brand-700 transition-colors group-hover:text-white" />
+                </span>
+                <h2 class="font-display text-lg font-bold tracking-tight text-brand-900 transition-colors group-hover:text-brand-600 sm:text-xl">{service.name}</h2>
+              </div>
+              <p class="mt-2 text-sm leading-relaxed text-stone-600">
+                {service.description.length > 120 ? service.description.slice(0, 120) + '…' : service.description}
+              </p>
+            </div>
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-stone-200 text-brand-600 transition-all duration-300 group-hover:border-transparent group-hover:bg-gradient-to-br group-hover:from-accent-500 group-hover:to-brand-500 group-hover:text-white">
+              <Icon name="lucide:arrow-right" class="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-brand-950 py-16 lg:py-20">
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/90 to-brand-900"></div>
+    <div class="blueprint-grid-dark absolute inset-0 opacity-70"></div>
+    <div class="absolute -bottom-24 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-accent-500/15 blur-[120px]"></div>
+    <div class="relative mx-auto max-w-7xl px-5 lg:px-8">
+      <div class="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-start">
+        <div>
+          <h2 class="font-display text-3xl font-bold tracking-tight text-white">{t.ctaTitle}</h2>
+          <p class="mt-2 text-brand-200">
+            {t.ctaText}
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-wrap gap-4">
+          <a
+            href={business.phoneHref}
+            class="btn-shine group inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-accent-500 to-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-600/30 transition-all hover:-translate-y-0.5"
+          >
+            <Icon name="lucide:phone" class="size-5" />
+            <span dir="ltr">{business.phone}</span>
+          </a>
+          <a
+            href={contactUrl(lang)}
+            class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:border-white/30 hover:bg-white/10"
+          >
+            {t.quote}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
