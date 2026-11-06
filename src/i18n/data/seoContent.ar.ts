@@ -9,7 +9,7 @@ import type { FaqItem } from '../../data/seoContent';
 export const quotationFaqAr: FaqItem = {
   question: 'كيف أحصل على عرض سعر؟',
   answer:
-    'أرسلوا إلينا الرسومات والمواصفات والكميات ومتطلبات المواد. اتصلوا على ⁦+971 2 564 9566⁩ أو راسلونا على info@ductmasters.ae وسنرد عليكم بعرض سعر مفصّل.',
+    'أرسلوا إلينا الرسومات والمواصفات والكميات ومتطلبات المواد. اتصلوا على ⁦+971 2 556 4459⁩ أو راسلونا على info@ductmasters.ae وسنرد عليكم بعرض سعر مفصّل.',
 };
 
 export const licenceFaqAr: FaqItem = {

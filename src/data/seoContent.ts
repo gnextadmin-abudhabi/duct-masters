@@ -40,7 +40,7 @@ const MAX_FAQS = 5;
 const quotationFaqEn: FaqItem = {
   question: 'How do I get a quotation?',
   answer:
-    'Send your drawings, specifications, quantities, and material requirements. Call +971 2 564 9566 or email info@ductmasters.ae and we will reply with a detailed quotation.',
+    'Send your drawings, specifications, quantities, and material requirements. Call +971 2 556 4459 or email info@ductmasters.ae and we will reply with a detailed quotation.',
 };
 
 const licenceFaqEn: FaqItem = {

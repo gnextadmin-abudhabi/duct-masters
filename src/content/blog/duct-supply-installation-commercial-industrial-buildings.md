@@ -48,4 +48,4 @@ While Duct Masters focuses on manufacturing and supply, we coordinate closely wi
 - Quality manufacturing to SMACNA standards
 - Competitive pricing for project supply contracts
 
-Contact us at info@ductmasters.ae or call +971 2 564 9566 to discuss your duct supply requirements.
+Contact us at info@ductmasters.ae or call +971 2 556 4459 to discuss your duct supply requirements.

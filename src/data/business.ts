@@ -60,8 +60,8 @@ export const business: Business = {
   tagline: 'HVAC Duct Manufacturing & Sheet Metal Fabrication in Abu Dhabi',
   description:
     'Duct Masters is an Abu Dhabi-based HVAC duct manufacturing and sheet metal fabrication company located in Musaffah. We manufacture and supply air conditioning ducting products and custom metal fabrication solutions for commercial, industrial, construction, infrastructure, and HVAC projects across Abu Dhabi and the UAE.',
-  phone: '+971 2 564 9566',
-  phoneHref: 'tel:+97125649566',
+  phone: '+971 2 556 4459',
+  phoneHref: 'tel:+97125564459',
   phoneSecondary: '+971 56 355 7931',
   whatsapp: 'https://wa.me/971563557931',
   email: 'info@ductmasters.ae',

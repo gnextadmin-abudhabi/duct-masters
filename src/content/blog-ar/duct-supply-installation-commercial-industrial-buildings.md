@@ -48,4 +48,4 @@ services: ['supply-delivery', 'duct-fabrication']
 - تصنيع عالي الجودة وفق معايير SMACNA
 - أسعار تنافسية لعقود توريد المشاريع
 
-تواصلوا معنا عبر البريد الإلكتروني <span dir="ltr">info@ductmasters.ae</span> أو اتصلوا على <span dir="ltr">+971 2 564 9566</span> لمناقشة متطلبات توريد مجاري الهواء.
+تواصلوا معنا عبر البريد الإلكتروني <span dir="ltr">info@ductmasters.ae</span> أو اتصلوا على <span dir="ltr">+971 2 556 4459</span> لمناقشة متطلبات توريد مجاري الهواء.

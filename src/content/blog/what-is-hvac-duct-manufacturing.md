@@ -39,4 +39,4 @@ In the UAE's demanding climate, where air conditioning runs year-round, the qual
 
 ## How Duct Masters Can Help
 
-At Duct Masters, we manufacture HVAC ductwork to SMACNA standards from our facility in M-40, Musaffah, Abu Dhabi. We serve contractors, MEP companies, and project developers across the UAE. Contact us at +971 2 564 9566 to discuss your project requirements.
+At Duct Masters, we manufacture HVAC ductwork to SMACNA standards from our facility in M-40, Musaffah, Abu Dhabi. We serve contractors, MEP companies, and project developers across the UAE. Contact us at +971 2 556 4459 to discuss your project requirements.
